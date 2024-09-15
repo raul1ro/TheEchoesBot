@@ -1,7 +1,7 @@
 package com.bot.theechoesbot.core.handler.slash;
 
 import com.bot.theechoesbot.core.handler.slash.template.SlashHandler;
-import com.bot.theechoesbot.core.listener.BotListener;
+import com.bot.theechoesbot.object.ServerData;
 import net.dv8tion.jda.api.entities.ScheduledEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -15,10 +15,10 @@ public class SlashEventStartHandler implements SlashHandler{
 
 	private final Logger logger = LoggerFactory.getLogger(SlashEventStartHandler.class);
 
-	private final BotListener bot;
+	private final ServerData serverData;
 
-	public SlashEventStartHandler(BotListener bot){
-		this.bot = bot;
+	public SlashEventStartHandler(ServerData serverData){
+		this.serverData = serverData;
 	}
 
 	@Override
@@ -27,6 +27,7 @@ public class SlashEventStartHandler implements SlashHandler{
 		try{
 
 			//extract the input event id
+			//noinspection OptionalGetWithoutIsPresent
 			String eventId = event.getOptions().stream()
 				.filter(e -> e.getName().equals("event_id"))
 				.findFirst()
@@ -49,8 +50,10 @@ public class SlashEventStartHandler implements SlashHandler{
 			scheduledEvent.getManager()
 				.setStatus(ScheduledEvent.Status.ACTIVE)
 				.and(
-					bot.getAnnouncesChannel().sendMessage(
-						"[" + scheduledEvent.getName() + "](https://discord.com/events/" + this.bot.getGuildId() + "/" + eventId + ") is starting. Get Ready."
+					this.serverData.getAnnouncesChannel().sendMessage(
+						"@everyone\n[" +
+							scheduledEvent.getName() +
+							"](https://discord.com/events/" + this.serverData.getGuildId() + "/" + eventId + ") is starting. Get Ready."
 					)
 				).queue();
 

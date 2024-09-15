@@ -1,5 +1,8 @@
-package com.bot.theechoesbot.core.crawler.template;
+package com.bot.theechoesbot.core.service.template;
 
+/**
+ * Crawl data from the game
+ */
 public interface GameCrawler{
 
 	/**

@@ -3,8 +3,11 @@ package com.bot.theechoesbot.core.handler;
 import com.bot.theechoesbot.core.Globals;
 import com.bot.theechoesbot.core.handler.template.Handler;
 import com.bot.theechoesbot.core.listener.BotListener;
+import com.bot.theechoesbot.object.ServerData;
 import net.dv8tion.jda.api.entities.ScheduledEvent;
 import net.dv8tion.jda.api.events.guild.scheduledevent.ScheduledEventCreateEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
@@ -14,27 +17,37 @@ import java.time.format.DateTimeFormatter;
  */
 public class EventCreateHandler implements Handler<ScheduledEventCreateEvent>{
 
-	private final BotListener bot;
+	private final Logger logger = LoggerFactory.getLogger(EventCreateHandler.class);
+
+	private final ServerData serverData;
 
 	private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("EEEE (dd MMM)");
 
-	public EventCreateHandler(BotListener bot){
-		this.bot = bot;
+	public EventCreateHandler(ServerData serverData){
+		this.serverData = serverData;
 	}
 
 	@Override
 	public void handle(ScheduledEventCreateEvent event){
 
-		ScheduledEvent scheduledEvent = event.getScheduledEvent();
+		try{
 
-		OffsetDateTime startTime = scheduledEvent.getStartTime();
-		String startDay = startTime.atZoneSameInstant(Globals.ZONE_ID_SERVER).format(dateTimeFormatter);
+			ScheduledEvent scheduledEvent = event.getScheduledEvent();
 
-		String message = "- "
-			+ startDay
-			+ " - [" + scheduledEvent.getName() + "](https://discord.com/events/" + this.bot.getGuildId() + "/" + scheduledEvent.getId() + ")";
+			OffsetDateTime startTime = scheduledEvent.getStartTime();
+			String startDay = startTime.atZoneSameInstant(Globals.ZONE_ID_SERVER).format(dateTimeFormatter);
 
-		bot.getScheduleChannel().sendMessage(message).queue();
+			String message = "- "
+				+ startDay
+				+ " - [" + scheduledEvent.getName() + "](https://discord.com/events/" + this.serverData.getGuildId() + "/" + scheduledEvent.getId() + ")";
+
+			this.serverData.getScheduleChannel().sendMessage(message).queue();
+
+		}catch(Exception e){
+
+			logger.error("Error adding the event in schedule", e);
+
+		}
 
 	}
 
