@@ -1,7 +1,6 @@
 package com.bot.theechoesbot.core.service;
 
 import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
@@ -99,13 +98,14 @@ public class DiscordUtil{
 		try{
 
 			//clear the channel
-			registerChannel.getHistory().retrievePast(100).queue(
-				(successHistory) -> {
-					registerChannel.deleteMessages(successHistory).queue(
-						(successClear) -> logger.info("The " + registerChannel.getName() + " was cleared"),
-						(errorClear) -> logger.error("Error clearing " + registerChannel.getName(), errorClear)
+			registerChannel.getHistory().retrievePast(100).queue( //get the messages
+				(successHistory) -> successHistory.forEach(e -> { //iterate every message
+					e.delete().queue( //delete every message
+						(successDelete) -> {},
+						(errorDelete) -> logger.error("Error deleting message")
 					);
-				},
+					logger.info("Success clearing the " + registerChannel.getName() + " channel");
+				}),
 				(errorHistory) -> logger.error("Error getting messages from " + registerChannel.getName(), errorHistory)
 			);
 
@@ -113,17 +113,18 @@ public class DiscordUtil{
 			Button internButton = Button.secondary("register_intern", "Intern");
 			Button memberButton = Button.success("register_member", "Member");
 
-			MessageCreateData message = new MessageCreateBuilder().setContent(
-				"""
-				To have access to the server you need to register yourself.
-				You can register yourself as **Intern** or **Member**.
-				- Intern - you are not in guild. Limited access.
-				- Member - you are in the guild. Full access.
-
-				**For any problem please contact <@328569043974094849> or <@658643411120685066>.**
-				"""
-			).setAllowedMentions(List.of()) //no ping
-				.setActionRow(internButton, memberButton)
+			MessageCreateData message = new MessageCreateBuilder()
+				.setAllowedMentions(List.of()) //no visible mention
+				.setContent(
+					"""
+					To have access to the server you need to register yourself.
+					You can register yourself as **Intern** or **Member**.
+					- Intern - you are not in guild. Limited access.
+					- Member - you are in the guild. Full access.
+	
+					**For any problem please contact <@328569043974094849> or <@658643411120685066>.**
+					"""
+				).setActionRow(internButton, memberButton)
 				.build();
 
 			registerChannel.sendMessage(message).queue();
