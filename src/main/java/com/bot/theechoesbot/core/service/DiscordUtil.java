@@ -82,6 +82,12 @@ public class DiscordUtil{
 							"event_id",
 							"The id of the event.",
 							true
+						),
+						new OptionData(
+							OptionType.STRING,
+							"message",
+							"(optional) Additional message.",
+							false
 						)
 					)
 
@@ -99,13 +105,16 @@ public class DiscordUtil{
 
 			//clear the channel
 			registerChannel.getHistory().retrievePast(100).queue( //get the messages
-				(successHistory) -> successHistory.forEach(e -> { //iterate every message
-					e.delete().queue( //delete every message
-						(successDelete) -> {},
-						(errorDelete) -> logger.error("Error deleting message")
-					);
+				(successHistory) -> {
+					successHistory.forEach(e -> { //iterate every message
+						e.delete().queue( //delete every message
+							(successDelete) -> {},
+							(errorDelete) -> logger.error("Error deleting message")
+						);
+
+					});
 					logger.info("Success clearing the " + registerChannel.getName() + " channel");
-				}),
+				},
 				(errorHistory) -> logger.error("Error getting messages from " + registerChannel.getName(), errorHistory)
 			);
 
@@ -115,6 +124,7 @@ public class DiscordUtil{
 
 			MessageCreateData message = new MessageCreateBuilder()
 				.setAllowedMentions(List.of()) //no visible mention
+				.setSuppressedNotifications(true) //no notification
 				.setContent(
 					"""
 					To have access to the server you need to register yourself.

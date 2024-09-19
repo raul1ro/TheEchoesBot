@@ -5,6 +5,7 @@ import com.bot.theechoesbot.object.ServerData;
 import net.dv8tion.jda.api.entities.ScheduledEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import net.dv8tion.jda.api.utils.MarkdownUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,13 +30,12 @@ public class SlashEventStartHandler implements SlashHandler{
 			//defer reply
 			event.deferReply().queue();
 
-			//extract the input event id
-			//noinspection OptionalGetWithoutIsPresent
-			String eventId = event.getOptions().stream()
-				.filter(e -> e.getName().equals("event_id"))
-				.findFirst()
-				.map(OptionMapping::getAsString)
-				.get(); //the input event_id is required, the discord client is forcing the user to give value.
+			String eventId = event.getOption("event_id").getAsString();
+			String message = null;
+			OptionMapping messageOption = event.getOption("message");
+			if(messageOption != null){
+				message = messageOption.getAsString();
+			}
 
 			//get the schedule and validate it
 			ScheduledEvent scheduledEvent = event.getJDA().getScheduledEventById(eventId);
@@ -54,9 +54,13 @@ public class SlashEventStartHandler implements SlashHandler{
 				.setStatus(ScheduledEvent.Status.ACTIVE)
 				.and(
 					this.serverData.getAnnouncesChannel().sendMessage(
-						"@everyone\n[" +
-							scheduledEvent.getName() +
-							"](https://discord.com/events/" + this.serverData.getGuildId() + "/" + eventId + ") is starting. Get Ready."
+						"@everyone\n" +
+							MarkdownUtil.maskedLink(
+								scheduledEvent.getName(),
+								"https://discord.com/events/" + this.serverData.getGuildId() + "/" + eventId
+							) +
+							" is starting. Get Ready." +
+							(message != null ? "\n" + message : "")
 					)
 				).queue(
 
