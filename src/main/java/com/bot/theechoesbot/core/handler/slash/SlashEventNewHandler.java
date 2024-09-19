@@ -3,8 +3,13 @@ package com.bot.theechoesbot.core.handler.slash;
 import com.bot.theechoesbot.core.Globals;
 import com.bot.theechoesbot.core.handler.slash.template.SlashHandler;
 import com.bot.theechoesbot.object.ServerData;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.InteractionHook;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.requests.restaction.ScheduledEventAction;
+import net.dv8tion.jda.api.utils.MarkdownUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,14 +37,30 @@ public class SlashEventNewHandler implements SlashHandler{
 	@Override
 	public void handle(SlashCommandInteractionEvent event){
 
+		//process may take more than 3 seconds, so set bot in thinking mode (15mins to reply)
+		event.deferReply().queue();
+
 		//extract the inputs
 		String title = event.getOption("title").getAsString();
 		String date = event.getOption("date").getAsString();
 		String time = event.getOption("time").getAsString();
-		String description = null;
-		try{
-			description = event.getOption("description").getAsString();
-		}catch(Exception ignored){}
+
+		//description var
+		String description;
+
+		//leader
+		OptionMapping leaderOption = event.getOption("leader");
+		if(leaderOption != null){
+			description = "**Leader: " + leaderOption.getAsMember().getNickname() + "**";
+		}else{
+			description = "**Leader: " + event.getMember().getNickname() + "**";
+		}
+
+		//description
+		OptionMapping descriptionOption = event.getOption("description");
+		if(descriptionOption != null){
+			description = description + "\n" + descriptionOption.getAsString();
+		}
 
 		//prepare date-time
 		OffsetDateTime dateTime;
@@ -54,7 +75,7 @@ public class SlashEventNewHandler implements SlashHandler{
 		}catch(Exception e){
 
 			logger.error("Invalid format: " + date + " - " + time, e);
-			event.reply("Date (yyyy-mm-dd) or time (hh:mm server-time) in wrong format: " + date + " - " + time).queue();
+			event.getHook().sendMessage("Date (yyyy-mm-dd) or time (hh:mm server-time) in wrong format: " + date + " - " + time).queue();
 			return;
 
 		}
@@ -75,20 +96,33 @@ public class SlashEventNewHandler implements SlashHandler{
 			scheduledEvent.queue(
 				(success) -> {
 
+					//get the id
 					String eventId = success.getId();
-					event.reply(
-						"Event created. Id: [" + eventId +
-						"](https://discord.com/events/" + this.serverData.getGuildId() + "/" + eventId + ")"
+
+					//get the hook
+					InteractionHook hook = event.getHook();
+
+					//send the messages
+					hook.sendMessage(
+						"Event created: " + eventId
+					).and(
+						hook.sendMessage(
+							MarkdownUtil.maskedLink(eventId, "https://discord.com/events/" + this.serverData.getGuildId() + "/" + eventId)
+						)
 					).queue();
 
+
 				},
-				(error) -> event.reply("Error: " + error.getMessage()).queue()
+				(error) -> {
+					logger.error("Error creating scheduled event", error);
+					event.getHook().sendMessage("Error: " + error.getMessage()).queue();
+				}
 			);
 
 		}catch(Exception e){
 
 			logger.error("Error creating scheduled event", e);
-			event.reply("Error: " + e.getMessage()).queue();
+			event.getHook().sendMessage("Error: " + e.getMessage()).queue();
 
 		}
 

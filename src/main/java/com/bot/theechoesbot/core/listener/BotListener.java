@@ -30,9 +30,6 @@ import org.springframework.stereotype.Service;
 @Service
 public class BotListener extends ListenerAdapter{
 
-	@Autowired
-	private Environment env;
-
 	private final Logger logger = LoggerFactory.getLogger(BotListener.class);
 
 	private final ServerData serverData;
@@ -48,7 +45,8 @@ public class BotListener extends ListenerAdapter{
 	private final ButtonInteractionHandler buttonInteractionHandler;
 	private final ModalInteractionHandler modalInteractionHandler;
 
-	public BotListener(){
+	@Autowired
+	public BotListener(Environment env){
 
 		//noinspection DataFlowIssue
 		this.serverData = new ServerData(

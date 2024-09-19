@@ -6,6 +6,7 @@ import com.bot.theechoesbot.core.listener.BotListener;
 import com.bot.theechoesbot.object.ServerData;
 import net.dv8tion.jda.api.entities.ScheduledEvent;
 import net.dv8tion.jda.api.events.guild.scheduledevent.ScheduledEventCreateEvent;
+import net.dv8tion.jda.api.utils.MarkdownUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,7 +40,8 @@ public class EventCreateHandler implements Handler<ScheduledEventCreateEvent>{
 
 			String message = "- "
 				+ startDay
-				+ " - [" + scheduledEvent.getName() + "](https://discord.com/events/" + this.serverData.getGuildId() + "/" + scheduledEvent.getId() + ")";
+				+ " - "
+				+ MarkdownUtil.maskedLink(scheduledEvent.getName(), "https://discord.com/events/" + this.serverData.getGuildId() + "/" + scheduledEvent.getId());
 
 			this.serverData.getScheduleChannel().sendMessage(message).queue();
 

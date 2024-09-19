@@ -1,6 +1,7 @@
 package com.bot.theechoesbot.core.service;
 
 import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
@@ -10,6 +11,8 @@ import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.List;
 
 /**
  * Some function for discord
@@ -63,6 +66,12 @@ public class DiscordUtil{
 							"description",
 							"(optional) The description of the event.",
 							false
+						),
+						new OptionData(
+							OptionType.USER,
+							"leader",
+							"(optional) The leader of the event.",
+							false
 						)
 					),
 
@@ -89,6 +98,17 @@ public class DiscordUtil{
 
 		try{
 
+			//clear the channel
+			registerChannel.getHistory().retrievePast(100).queue(
+				(successHistory) -> {
+					registerChannel.deleteMessages(successHistory).queue(
+						(successClear) -> logger.info("The " + registerChannel.getName() + " was cleared"),
+						(errorClear) -> logger.error("Error clearing " + registerChannel.getName(), errorClear)
+					);
+				},
+				(errorHistory) -> logger.error("Error getting messages from " + registerChannel.getName(), errorHistory)
+			);
+
 			//create the buttons
 			Button internButton = Button.secondary("register_intern", "Intern");
 			Button memberButton = Button.success("register_member", "Member");
@@ -102,7 +122,9 @@ public class DiscordUtil{
 
 				**For any problem please contact <@328569043974094849> or <@658643411120685066>.**
 				"""
-			).setActionRow(internButton, memberButton).build();
+			).setAllowedMentions(List.of()) //no ping
+				.setActionRow(internButton, memberButton)
+				.build();
 
 			registerChannel.sendMessage(message).queue();
 

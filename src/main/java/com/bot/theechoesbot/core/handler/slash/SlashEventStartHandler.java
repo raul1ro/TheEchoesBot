@@ -26,6 +26,9 @@ public class SlashEventStartHandler implements SlashHandler{
 
 		try{
 
+			//defer reply
+			event.deferReply().queue();
+
 			//extract the input event id
 			//noinspection OptionalGetWithoutIsPresent
 			String eventId = event.getOptions().stream()
@@ -37,11 +40,11 @@ public class SlashEventStartHandler implements SlashHandler{
 			//get the schedule and validate it
 			ScheduledEvent scheduledEvent = event.getJDA().getScheduledEventById(eventId);
 			if(scheduledEvent == null){
-				event.reply("Could not find event with id " + eventId).queue();
+				event.getHook().sendMessage("Could not find event with id " + eventId).queue();
 				return;
 			}
 			if(scheduledEvent.getStatus() != ScheduledEvent.Status.SCHEDULED){
-				event.reply("The event has already started.").queue();
+				event.getHook().sendMessage("The event has already started.").queue();
 				return;
 			}
 
@@ -55,15 +58,21 @@ public class SlashEventStartHandler implements SlashHandler{
 							scheduledEvent.getName() +
 							"](https://discord.com/events/" + this.serverData.getGuildId() + "/" + eventId + ") is starting. Get Ready."
 					)
-				).queue();
+				).queue(
 
-			//reply
-			event.reply("Event started.").queue();
+					//reply
+					(success) -> event.getHook().sendMessage("Event started: " + eventId).queue(),
+					(error) -> {
+						logger.error("Error starting event", error);
+						event.getHook().sendMessage("Error: " + error.getMessage()).queue();
+					}
+
+				);
 
 		}catch(Exception e){
 
 			logger.error("Error starting event", e);
-			event.reply("Error starting event: " + e.getMessage()).queue();
+			event.getHook().sendMessage("Error starting event: " + e.getMessage()).queue();
 
 		}
 

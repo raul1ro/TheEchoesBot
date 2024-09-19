@@ -29,6 +29,9 @@ public class RegisterService{
 
 		try{
 
+			//defer
+			event.deferReply(true).queue();
+
 			//get the role - the id was taken manually.
 			Role internRole = event.getJDA().getRoleById(1144309530684035223L);
 
@@ -40,12 +43,12 @@ public class RegisterService{
 				).queue();
 
 			//reply
-			event.reply("Register successfully.\nRole: " + internRole.getName() + "\nIf the registration is wrong contact <@328569043974094849> or <@658643411120685066>.").setEphemeral(true).queue();
+			event.getHook().sendMessage("Register successfully.\nRole: " + internRole.getName() + "\nIf the registration is wrong contact <@328569043974094849> or <@658643411120685066>.").queue();
 
 		}catch(Exception e){
 
 			logger.error("Error registering intern.", e);
-			event.reply("Error registering as Intern.").setEphemeral(true).queue();
+			event.getHook().sendMessage("Error registering as Intern.").queue();
 		}
 
 	}
@@ -87,12 +90,14 @@ public class RegisterService{
 
 		try{
 
+			event.deferReply(true).queue();
+
 			String characterName = event.getValue("input_character_name").getAsString();
 
 			//get the user data and validate it.
 			String[] userData = gameCrawler.getUserData(characterName);
 			if(userData == null){
-				event.reply("The character \"" + characterName + "\" not found in guild.\nIf you think this is an error contact <@328569043974094849> or <@658643411120685066>.").setEphemeral(true).queue();
+				event.getHook().sendMessage("The character \"" + characterName + "\" not found in guild.\nIf you think this is an error contact <@328569043974094849> or <@658643411120685066>.").setEphemeral(true).queue();
 				return;
 			}
 
@@ -102,7 +107,7 @@ public class RegisterService{
 
 			//if the character from guild is no longer Bober - that means he was already registered.
 			if(!guildRank.equals("Bober")){
-				event.reply("The character \"" + characterName + "\" is already registered.\nIf you think this is an error contact <@328569043974094849> or <@658643411120685066>.").setEphemeral(true).queue();
+				event.getHook().sendMessage("The character \"" + characterName + "\" is already registered.\nIf you think this is an error contact <@328569043974094849> or <@658643411120685066>.").setEphemeral(true).queue();
 				return;
 			}
 
@@ -113,7 +118,7 @@ public class RegisterService{
 			//if the nickname is taken by another member
 			boolean memberFound = !(guild.getMembersByNickname(characterName, true).isEmpty());
 			if(memberFound){
-				event.reply("The character \"" + characterName + "\" is already registered. If you think this is an error contact <@328569043974094849> or <@658643411120685066>.").setEphemeral(true).queue();
+				event.getHook().sendMessage("The character \"" + characterName + "\" is already registered. If you think this is an error contact <@328569043974094849> or <@658643411120685066>.").setEphemeral(true).queue();
 				return;
 			}
 
@@ -122,12 +127,12 @@ public class RegisterService{
 			guild.addRoleToMember(member, memberRole).queue();
 
 			//reply
-			event.reply("Register successfully.\nNickname: " + characterName + "\nRole: " + memberRole.getName() + "\nIf the registration is wrong contact <@328569043974094849> or <@658643411120685066>.").setEphemeral(true).queue();
+			event.getHook().sendMessage("Register successfully.\nNickname: " + characterName + "\nRole: " + memberRole.getName() + "\nIf the registration is wrong contact <@328569043974094849> or <@658643411120685066>.").setEphemeral(true).queue();
 
 		}catch(Exception e){
 
 			logger.error("Error registering member.", e);
-			event.reply("Error registering as Member.").setEphemeral(true).queue();
+			event.getHook().sendMessage("Error registering as Member.").setEphemeral(true).queue();
 
 		}
 
