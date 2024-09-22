@@ -3,8 +3,7 @@ package com.bot.theechoesbot.core.handler.slash;
 import com.bot.theechoesbot.core.Globals;
 import com.bot.theechoesbot.core.handler.slash.template.SlashHandler;
 import com.bot.theechoesbot.object.ServerData;
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.MessageEmbed;
+import com.sun.net.httpserver.Authenticator;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -24,7 +23,7 @@ import java.time.format.DateTimeFormatter;
 @SuppressWarnings("DataFlowIssue")
 public class SlashEventNewHandler implements SlashHandler{
 
-	private final Logger logger = LoggerFactory.getLogger(SlashEventNewHandler.class);
+	private final static Logger logger = LoggerFactory.getLogger(SlashEventNewHandler.class);
 
 	private final ServerData serverData;
 
@@ -73,11 +72,9 @@ public class SlashEventNewHandler implements SlashHandler{
 				.toOffsetDateTime();
 
 		}catch(Exception e){
-
-			logger.error("Invalid format: " + date + " - " + time, e);
 			event.getHook().sendMessage("Date (yyyy-mm-dd) or time (hh:mm server-time) in wrong format: " + date + " - " + time).queue();
+			logger.error("Invalid format: " + date + " - " + time, e);
 			return;
-
 		}
 
 		try{
@@ -99,31 +96,31 @@ public class SlashEventNewHandler implements SlashHandler{
 					//get the id
 					String eventId = success.getId();
 
+					logger.info("Event created: " + eventId);
+
 					//get the hook
 					InteractionHook hook = event.getHook();
 
 					//send the messages
-					hook.sendMessage(
-						"Event created: " + eventId
-					).and(
+					hook.sendMessage("Event created: " + eventId).and(
 						hook.sendMessage(
 							MarkdownUtil.maskedLink(eventId, "https://discord.com/events/" + this.serverData.getGuildId() + "/" + eventId)
 						)
-					).queue();
-
+					).queue(
+						(success1) -> {},
+						(error1) -> logger.error("Error callback-eventNew", error1)
+					);
 
 				},
 				(error) -> {
-					logger.error("Error creating scheduled event", error);
 					event.getHook().sendMessage("Error: " + error.getMessage()).queue();
+					logger.error("Error creating scheduled event", error);
 				}
 			);
 
 		}catch(Exception e){
-
-			logger.error("Error creating scheduled event", e);
 			event.getHook().sendMessage("Error: " + e.getMessage()).queue();
-
+			logger.error("Error creating scheduled event", e);
 		}
 
 	}

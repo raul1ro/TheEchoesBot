@@ -2,7 +2,6 @@ package com.bot.theechoesbot.core.handler;
 
 import com.bot.theechoesbot.core.Globals;
 import com.bot.theechoesbot.core.handler.template.Handler;
-import com.bot.theechoesbot.core.listener.BotListener;
 import com.bot.theechoesbot.object.ServerData;
 import net.dv8tion.jda.api.entities.ScheduledEvent;
 import net.dv8tion.jda.api.events.guild.scheduledevent.ScheduledEventCreateEvent;
@@ -18,7 +17,7 @@ import java.time.format.DateTimeFormatter;
  */
 public class EventCreateHandler implements Handler<ScheduledEventCreateEvent>{
 
-	private final Logger logger = LoggerFactory.getLogger(EventCreateHandler.class);
+	private final static Logger logger = LoggerFactory.getLogger(EventCreateHandler.class);
 
 	private final ServerData serverData;
 
@@ -46,9 +45,7 @@ public class EventCreateHandler implements Handler<ScheduledEventCreateEvent>{
 			this.serverData.getScheduleChannel().sendMessage(message).queue();
 
 		}catch(Exception e){
-
 			logger.error("Error adding the event in schedule", e);
-
 		}
 
 	}

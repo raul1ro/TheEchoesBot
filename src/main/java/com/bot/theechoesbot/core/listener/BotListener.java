@@ -12,6 +12,7 @@ import com.bot.theechoesbot.core.service.DiscordUtil;
 import com.bot.theechoesbot.object.ServerData;
 import net.dv8tion.jda.api.events.guild.scheduledevent.ScheduledEventCreateEvent;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.session.ReadyEvent;
@@ -30,7 +31,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class BotListener extends ListenerAdapter{
 
-	private final Logger logger = LoggerFactory.getLogger(BotListener.class);
+	private final static Logger logger = LoggerFactory.getLogger(BotListener.class);
 
 	private final ServerData serverData;
 
@@ -98,7 +99,11 @@ public class BotListener extends ListenerAdapter{
 			case "roll": slashRollHandler.handle(event); break;
 			case "event-new": slashEventNewHandler.handle(event); break;
 			case "event-start": slashEventStartHandler.handle(event); break;
-			default: event.reply("Unknown command").setEphemeral(true).queue();
+			default: {
+				event.reply("Unknown command").setEphemeral(true).queue();
+				logger.warn("Unknown command: " + event.getName());
+				break;
+			}
 		}
 
 	}
@@ -118,4 +123,8 @@ public class BotListener extends ListenerAdapter{
 		modalInteractionHandler.handle(event);
 	}
 
+	@Override
+	public void onCommandAutoCompleteInteraction(@NotNull CommandAutoCompleteInteractionEvent event){
+		super.onCommandAutoCompleteInteraction(event);
+	}
 }

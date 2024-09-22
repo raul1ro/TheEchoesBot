@@ -12,9 +12,10 @@ import org.slf4j.LoggerFactory;
 /**
  * Implement /event-start
  */
+@SuppressWarnings("DataFlowIssue")
 public class SlashEventStartHandler implements SlashHandler{
 
-	private final Logger logger = LoggerFactory.getLogger(SlashEventStartHandler.class);
+	private final static Logger logger = LoggerFactory.getLogger(SlashEventStartHandler.class);
 
 	private final ServerData serverData;
 
@@ -41,10 +42,12 @@ public class SlashEventStartHandler implements SlashHandler{
 			ScheduledEvent scheduledEvent = event.getJDA().getScheduledEventById(eventId);
 			if(scheduledEvent == null){
 				event.getHook().sendMessage("Could not find event with id " + eventId).queue();
+				logger.warn("Event not found: " + eventId);
 				return;
 			}
 			if(scheduledEvent.getStatus() != ScheduledEvent.Status.SCHEDULED){
 				event.getHook().sendMessage("The event has already started.").queue();
+				logger.warn("Event has already started: " + eventId);
 				return;
 			}
 
@@ -65,19 +68,26 @@ public class SlashEventStartHandler implements SlashHandler{
 				).queue(
 
 					//reply
-					(success) -> event.getHook().sendMessage("Event started: " + eventId).queue(),
+					(success) -> {
+
+						logger.info("Event started: " + eventId);
+
+						event.getHook().sendMessage("Event started: " + eventId).queue(
+							s -> {},
+							e -> logger.info("Error callback-eventStart: " + eventId, e)
+						);
+
+					},
 					(error) -> {
-						logger.error("Error starting event", error);
 						event.getHook().sendMessage("Error: " + error.getMessage()).queue();
+						logger.error("Error starting event: " + eventId, error);
 					}
 
 				);
 
 		}catch(Exception e){
-
-			logger.error("Error starting event", e);
 			event.getHook().sendMessage("Error starting event: " + e.getMessage()).queue();
-
+			logger.error("Error starting event", e);
 		}
 
 	}

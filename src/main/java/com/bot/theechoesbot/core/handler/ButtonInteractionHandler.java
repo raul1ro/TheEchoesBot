@@ -16,7 +16,7 @@ import java.util.List;
 @SuppressWarnings("DataFlowIssue")
 public class ButtonInteractionHandler implements Handler<ButtonInteractionEvent>{
 
-	private final Logger logger = LoggerFactory.getLogger(ButtonInteractionHandler.class);
+	private final static Logger logger = LoggerFactory.getLogger(ButtonInteractionHandler.class);
 
 	private final RegisterService registerService;
 
@@ -34,6 +34,7 @@ public class ButtonInteractionHandler implements Handler<ButtonInteractionEvent>
 		List<Role> roles = event.getMember().getRoles();
 		if(!roles.isEmpty()){
 			event.reply("You are already registered.\nIf you think this is an error contact <@328569043974094849> or <@658643411120685066>.").setEphemeral(true).queue();
+			logger.info("User already registered: " + member.getEffectiveName());
 			return;
 		}
 
@@ -41,7 +42,11 @@ public class ButtonInteractionHandler implements Handler<ButtonInteractionEvent>
 
 			case "register_intern": registerService.registerIntern(event, member); break;
 			case "register_member": registerService.createModalRegisterMember(event); break;
-			default: event.reply("Unknown button id: " + buttonId).setEphemeral(true).queue();
+			default: {
+				event.reply("Unknown button id: " + buttonId).setEphemeral(true).queue();
+				logger.warn("Unknown button id: " + buttonId);
+				break;
+			}
 
 		}
 

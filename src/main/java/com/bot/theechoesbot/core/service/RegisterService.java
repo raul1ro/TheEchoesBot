@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory;
 @SuppressWarnings("DataFlowIssue")
 public class RegisterService{
 
-	private final Logger logger = LoggerFactory.getLogger(RegisterService.class);
+	private final static Logger logger = LoggerFactory.getLogger(RegisterService.class);
 
 	private final GameCrawler gameCrawler = new GameCrawlerImpl();
 
@@ -44,11 +44,11 @@ public class RegisterService{
 
 			//reply
 			event.getHook().sendMessage("Register successfully.\nRole: " + internRole.getName() + "\nIf the registration is wrong contact <@328569043974094849> or <@658643411120685066>.").queue();
+			logger.info("User registered as Intern: " + member.getEffectiveName());
 
 		}catch(Exception e){
-
-			logger.error("Error registering intern.", e);
 			event.getHook().sendMessage("Error registering as Intern.").queue();
+			logger.error("Error registering intern.", e);
 		}
 
 	}
@@ -128,6 +128,7 @@ public class RegisterService{
 
 			//reply
 			event.getHook().sendMessage("Register successfully.\nNickname: " + characterName + "\nRole: " + memberRole.getName() + "\nIf the registration is wrong contact <@328569043974094849> or <@658643411120685066>.").setEphemeral(true).queue();
+			logger.info("User registered as Member: " + member.getNickname());
 
 		}catch(Exception e){
 

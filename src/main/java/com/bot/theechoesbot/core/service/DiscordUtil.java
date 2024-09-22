@@ -18,7 +18,7 @@ import java.util.List;
  */
 public class DiscordUtil{
 
-	private final Logger logger = LoggerFactory.getLogger(DiscordUtil.class);
+	private final static Logger logger = LoggerFactory.getLogger(DiscordUtil.class);
 
 	/**
 	 * Update the commands
@@ -53,6 +53,7 @@ public class DiscordUtil{
 							"date",
 							"Date of the event. Format: yyyy-mm-dd",
 							true
+
 						),
 						new OptionData(
 							OptionType.STRING,
@@ -91,7 +92,10 @@ public class DiscordUtil{
 						)
 					)
 
-			).queue();
+			).queue(
+				s -> logger.info("Updated the commands."),
+				e -> logger.error("Error updating the commands.", e)
+			);
 
 	}
 
@@ -137,11 +141,14 @@ public class DiscordUtil{
 				).setActionRow(internButton, memberButton)
 				.build();
 
-			registerChannel.sendMessage(message).queue();
+			registerChannel.sendMessage(message).queue(
+				s -> logger.info("Register message was created."),
+				e -> logger.error("Failed to create the register message.", e)
+			);
 
 		}catch(Exception e){
 
-			logger.error("Failed to initialize registerButtons", e);
+			logger.error("Failed to initRegister.", e);
 			throw e;
 
 		}

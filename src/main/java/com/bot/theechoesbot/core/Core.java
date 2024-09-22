@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class Core{
 
-	private final Logger logger = LoggerFactory.getLogger(Core.class);
+	private final static Logger logger = LoggerFactory.getLogger(Core.class);
 
 	private final BotListener bot;
 	private final JDA jda;

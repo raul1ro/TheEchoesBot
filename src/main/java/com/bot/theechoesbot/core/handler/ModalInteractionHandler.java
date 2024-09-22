@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
  */
 public class ModalInteractionHandler implements Handler<ModalInteractionEvent>{
 
-	private final Logger logger = LoggerFactory.getLogger(ModalInteractionHandler.class);
+	private final static Logger logger = LoggerFactory.getLogger(ModalInteractionHandler.class);
 
 	private final RegisterService registerService;
 	public ModalInteractionHandler(RegisterService registerService) {
@@ -28,7 +28,11 @@ public class ModalInteractionHandler implements Handler<ModalInteractionEvent>{
 		switch(modalId){
 
 			case "modal_register_member": this.registerService.registerMember(event, member); break;
-			default: event.reply("Unknown modal id: " + modalId).setEphemeral(true).queue(); break;
+			default: {
+				event.reply("Unknown modal id: " + modalId).setEphemeral(true).queue();
+				logger.warn("Unknown modal id: " + modalId);
+				break;
+			}
 
 		}
 
