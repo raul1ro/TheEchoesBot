@@ -9,7 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Handle for Modal
+ * Handle for ModalInteractionEvent
  */
 public class ModalInteractionHandler implements Handler<ModalInteractionEvent>{
 

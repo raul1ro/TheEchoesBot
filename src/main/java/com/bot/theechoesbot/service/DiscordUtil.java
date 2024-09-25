@@ -1,6 +1,7 @@
 package com.bot.theechoesbot.service;
 
 import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
@@ -90,6 +91,23 @@ public class DiscordUtil{
 							"(optional) Additional message in announcement.",
 							false
 						)
+					),
+
+				//event-cancel
+				Commands.slash("event-cancel", "Cancel the event.")
+					.addOptions(
+						new OptionData(
+							OptionType.STRING,
+							"event_id",
+							"The id of the event.",
+							true
+						),
+						new OptionData(
+							OptionType.STRING,
+							"reason",
+							"(optional) The Reason of cancellation.",
+							false
+						)
 					)
 
 			).queue(
@@ -107,25 +125,17 @@ public class DiscordUtil{
 
 		try{
 
-			//clear the channel
-			registerChannel.getHistory().retrievePast(100).queue( //get the messages
-				(successHistory) -> {
-					successHistory.forEach(e -> { //iterate every message
-						e.delete().queue( //delete every message
-							(successDelete) -> {},
-							(errorDelete) -> logger.error("Error deleting message")
-						);
-
-					});
-					logger.info("Successfully cleared the " + registerChannel.getName() + " channel");
-				},
-				(errorHistory) -> logger.error("Error getting messages from " + registerChannel.getName(), errorHistory)
-			);
+			//clear the channel - but with thread lock
+			//to be sure the clear will not execute too late and delete register message
+			List<Message> messages = registerChannel.getHistory().retrievePast(5).complete();
+			messages.forEach(e -> e.delete().complete());
+			logger.info("Successfully cleared the " + registerChannel.getName() + " channel");
 
 			//create the buttons
 			Button internButton = Button.secondary("register_intern", "Intern");
 			Button memberButton = Button.success("register_member", "Member");
 
+			//create the message
 			MessageCreateData message = new MessageCreateBuilder()
 				.setAllowedMentions(List.of()) //no visible mention
 				.setSuppressedNotifications(true) //no notification
@@ -141,6 +151,7 @@ public class DiscordUtil{
 				).setActionRow(internButton, memberButton)
 				.build();
 
+			//send the message
 			registerChannel.sendMessage(message).queue(
 				s -> logger.info("Register message was created."),
 				e -> logger.error("Failed to create the register message.", e)

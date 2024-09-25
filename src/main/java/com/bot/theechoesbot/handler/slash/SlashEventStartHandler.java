@@ -40,8 +40,8 @@ public class SlashEventStartHandler implements SlashHandler{
 				return;
 			}
 			if(scheduledEvent.getStatus() != ScheduledEvent.Status.SCHEDULED){
-				event.getHook().sendMessage("The event has already started.").queue();
-				logger.warn("Event has already started: " + eventId);
+				event.getHook().sendMessage("The event can't be started.").queue();
+				logger.warn("The event can't be started: " + eventId);
 				return;
 			}
 
@@ -74,14 +74,14 @@ public class SlashEventStartHandler implements SlashHandler{
 					},
 					(error) -> {
 						event.getHook().sendMessage("Error: " + error.getMessage()).queue();
-						logger.error("Error starting event: " + eventId, error);
+						logger.error("Error starting the event: " + eventId, error);
 					}
 
 				);
 
 		}catch(Exception e){
-			event.getHook().sendMessage("Error starting event: " + e.getMessage()).queue();
-			logger.error("Error starting event", e);
+			event.getHook().sendMessage("Error starting the event: " + e.getMessage()).queue();
+			logger.error("Error starting the event", e);
 		}
 
 	}

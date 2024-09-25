@@ -1,5 +1,7 @@
 package com.bot.theechoesbot.listener;
 
+import com.bot.theechoesbot.handler.EventCancelHandler;
+import com.bot.theechoesbot.handler.slash.SlashEventCancelHandler;
 import com.bot.theechoesbot.service.RegisterService;
 import com.bot.theechoesbot.handler.ButtonInteractionHandler;
 import com.bot.theechoesbot.handler.EventCreateHandler;
@@ -10,7 +12,9 @@ import com.bot.theechoesbot.handler.slash.SlashRollHandler;
 import com.bot.theechoesbot.handler.slash.template.SlashHandler;
 import com.bot.theechoesbot.service.DiscordUtil;
 import com.bot.theechoesbot.entity.ServerData;
+import net.dv8tion.jda.api.entities.ScheduledEvent;
 import net.dv8tion.jda.api.events.guild.scheduledevent.ScheduledEventCreateEvent;
+import net.dv8tion.jda.api.events.guild.scheduledevent.update.ScheduledEventUpdateStatusEvent;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -40,8 +44,10 @@ public class BotListener extends ListenerAdapter{
 	private final SlashHandler slashRollHandler;
 	private final SlashHandler slashEventNewHandler;
 	private final SlashHandler slashEventStartHandler;
+	private final SlashHandler slashEventCancelHandler;
 
 	private final EventCreateHandler eventCreateHandler;
+	private final EventCancelHandler eventCancelHandler;
 	private final ButtonInteractionHandler buttonInteractionHandler;
 	private final ModalInteractionHandler modalInteractionHandler;
 
@@ -62,8 +68,10 @@ public class BotListener extends ListenerAdapter{
 		this.slashRollHandler = new SlashRollHandler();
 		this.slashEventNewHandler = new SlashEventNewHandler();
 		this.slashEventStartHandler = new SlashEventStartHandler();
+		this.slashEventCancelHandler = new SlashEventCancelHandler();
 
 		this.eventCreateHandler = new EventCreateHandler();
+		this.eventCancelHandler = new EventCancelHandler();
 		this.buttonInteractionHandler = new ButtonInteractionHandler(this.registerService);
 		this.modalInteractionHandler = new ModalInteractionHandler(this.registerService);
 
@@ -100,6 +108,7 @@ public class BotListener extends ListenerAdapter{
 			case "roll": slashRollHandler.handle(event, serverData); break;
 			case "event-new": slashEventNewHandler.handle(event, serverData); break;
 			case "event-start": slashEventStartHandler.handle(event, serverData); break;
+			case "event-cancel": slashEventCancelHandler.handle(event, serverData); break;
 			default: {
 				event.reply("Unknown command").setEphemeral(true).queue();
 				logger.warn("Unknown command: " + event.getName());
@@ -112,6 +121,18 @@ public class BotListener extends ListenerAdapter{
 	@Override
 	public void onScheduledEventCreate(@NotNull ScheduledEventCreateEvent event){
 		eventCreateHandler.handle(event, serverData);
+	}
+
+	@Override
+	public void onScheduledEventUpdateStatus(@NotNull ScheduledEventUpdateStatusEvent event){
+
+		ScheduledEvent.Status status = event.getNewStatus();
+		switch(status){
+
+			case ScheduledEvent.Status.CANCELED -> eventCancelHandler.handle(event, serverData);
+
+		}
+
 	}
 
 	@Override

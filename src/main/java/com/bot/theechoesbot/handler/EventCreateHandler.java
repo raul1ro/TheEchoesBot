@@ -13,7 +13,7 @@ import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 
 /**
- * Implement Handler for ScheduledEvent
+ * Implement Handler for ScheduledEventCreateEvent
  */
 public class EventCreateHandler implements Handler<ScheduledEventCreateEvent>{
 
@@ -37,6 +37,8 @@ public class EventCreateHandler implements Handler<ScheduledEventCreateEvent>{
 				+ MarkdownUtil.maskedLink(scheduledEvent.getName(), "https://discord.com/events/" + serverData.getGuildId() + "/" + scheduledEvent.getId());
 
 			serverData.getTextScheduleChannel().sendMessage(message).queue();
+
+			logger.info("Created event was announced. " + scheduledEvent.getId());
 
 		}catch(Exception e){
 			logger.error("Error adding the event in schedule", e);
