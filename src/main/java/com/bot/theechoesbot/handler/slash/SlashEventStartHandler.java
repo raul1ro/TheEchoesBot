@@ -1,7 +1,7 @@
-package com.bot.theechoesbot.core.handler.slash;
+package com.bot.theechoesbot.handler.slash;
 
-import com.bot.theechoesbot.core.handler.slash.template.SlashHandler;
-import com.bot.theechoesbot.object.ServerData;
+import com.bot.theechoesbot.handler.slash.template.SlashHandler;
+import com.bot.theechoesbot.entity.ServerData;
 import net.dv8tion.jda.api.entities.ScheduledEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -17,14 +17,8 @@ public class SlashEventStartHandler implements SlashHandler{
 
 	private final static Logger logger = LoggerFactory.getLogger(SlashEventStartHandler.class);
 
-	private final ServerData serverData;
-
-	public SlashEventStartHandler(ServerData serverData){
-		this.serverData = serverData;
-	}
-
 	@Override
-	public void handle(SlashCommandInteractionEvent event){
+	public void handle(SlashCommandInteractionEvent event, ServerData serverData){
 
 		try{
 
@@ -56,11 +50,11 @@ public class SlashEventStartHandler implements SlashHandler{
 			scheduledEvent.getManager()
 				.setStatus(ScheduledEvent.Status.ACTIVE)
 				.and(
-					this.serverData.getAnnouncesChannel().sendMessage(
+					serverData.getNewsAnnouncesChannel().sendMessage(
 						"@everyone\n" +
 							MarkdownUtil.maskedLink(
 								scheduledEvent.getName(),
-								"https://discord.com/events/" + this.serverData.getGuildId() + "/" + eventId
+								"https://discord.com/events/" + serverData.getGuildId() + "/" + eventId
 							) +
 							" is starting. Get Ready." +
 							(message != null ? "\n" + message : "")

@@ -1,6 +1,6 @@
-package com.bot.theechoesbot.core.service;
+package com.bot.theechoesbot.service;
 
-import com.bot.theechoesbot.core.service.template.GameCrawler;
+import com.bot.theechoesbot.service.template.GameCrawler;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
@@ -25,22 +25,18 @@ public class RegisterService{
 	/**
 	 * Registering the user as Intern. Request come from a button
 	 */
-	public void registerIntern(ButtonInteractionEvent event, Member member){
+	public void registerIntern(ButtonInteractionEvent event, Member member, Guild guild, Role internRole){
 
 		try{
 
 			//defer
 			event.deferReply(true).queue();
 
-			//get the role - the id was taken manually.
-			Role internRole = event.getJDA().getRoleById(1144309530684035223L);
-
 			//add the role to the member
-			event.getGuild()
-				.addRoleToMember(
-					member,
-					internRole
-				).queue();
+			guild.addRoleToMember(
+				member,
+				internRole
+			).queue();
 
 			//reply
 			event.getHook().sendMessage("Register successfully.\nRole: " + internRole.getName() + "\nIf the registration is wrong contact <@328569043974094849> or <@658643411120685066>.").queue();
@@ -86,7 +82,7 @@ public class RegisterService{
 	/**
 	 * Register the user as Member. The request comes from a modal.
 	 */
-	public void registerMember(ModalInteractionEvent event, Member member){
+	public void registerMember(ModalInteractionEvent event, Member member, Guild guild, Role memberRole){
 
 		try{
 
@@ -110,10 +106,6 @@ public class RegisterService{
 				event.getHook().sendMessage("The character \"" + characterName + "\" is already registered.\nIf you think this is an error contact <@328569043974094849> or <@658643411120685066>.").setEphemeral(true).queue();
 				return;
 			}
-
-			//pre-load
-			Guild guild = event.getGuild();
-			Role memberRole = event.getJDA().getRoleById(1110962256197468170L);
 
 			//if the nickname is taken by another member
 			boolean memberFound = !(guild.getMembersByNickname(characterName, true).isEmpty());

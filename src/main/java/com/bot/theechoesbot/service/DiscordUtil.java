@@ -1,4 +1,4 @@
-package com.bot.theechoesbot.core.service;
+package com.bot.theechoesbot.service;
 
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -87,7 +87,7 @@ public class DiscordUtil{
 						new OptionData(
 							OptionType.STRING,
 							"message",
-							"(optional) Additional message.",
+							"(optional) Additional message in announcement.",
 							false
 						)
 					)
@@ -117,7 +117,7 @@ public class DiscordUtil{
 						);
 
 					});
-					logger.info("Success clearing the " + registerChannel.getName() + " channel");
+					logger.info("Successfully cleared the " + registerChannel.getName() + " channel");
 				},
 				(errorHistory) -> logger.error("Error getting messages from " + registerChannel.getName(), errorHistory)
 			);

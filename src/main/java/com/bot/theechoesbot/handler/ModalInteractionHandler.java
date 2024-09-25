@@ -1,7 +1,8 @@
-package com.bot.theechoesbot.core.handler;
+package com.bot.theechoesbot.handler;
 
-import com.bot.theechoesbot.core.handler.template.Handler;
-import com.bot.theechoesbot.core.service.RegisterService;
+import com.bot.theechoesbot.entity.ServerData;
+import com.bot.theechoesbot.handler.template.Handler;
+import com.bot.theechoesbot.service.RegisterService;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import org.slf4j.Logger;
@@ -20,14 +21,14 @@ public class ModalInteractionHandler implements Handler<ModalInteractionEvent>{
 	}
 
 	@Override
-	public void handle(ModalInteractionEvent event){
+	public void handle(ModalInteractionEvent event, ServerData serverData){
 
 		Member member = event.getMember();
 		String modalId = event.getModalId();
 
 		switch(modalId){
 
-			case "modal_register_member": this.registerService.registerMember(event, member); break;
+			case "modal_register_member": this.registerService.registerMember(event, member, serverData.getGuild(), serverData.getMemberRole()); break;
 			default: {
 				event.reply("Unknown modal id: " + modalId).setEphemeral(true).queue();
 				logger.warn("Unknown modal id: " + modalId);

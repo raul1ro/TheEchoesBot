@@ -1,9 +1,8 @@
-package com.bot.theechoesbot.core.handler.slash;
+package com.bot.theechoesbot.handler.slash;
 
 import com.bot.theechoesbot.core.Globals;
-import com.bot.theechoesbot.core.handler.slash.template.SlashHandler;
-import com.bot.theechoesbot.object.ServerData;
-import com.sun.net.httpserver.Authenticator;
+import com.bot.theechoesbot.handler.slash.template.SlashHandler;
+import com.bot.theechoesbot.entity.ServerData;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -25,16 +24,10 @@ public class SlashEventNewHandler implements SlashHandler{
 
 	private final static Logger logger = LoggerFactory.getLogger(SlashEventNewHandler.class);
 
-	private final ServerData serverData;
-
 	private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd - HH:mm");
 
-	public SlashEventNewHandler(ServerData serverData){
-		this.serverData = serverData;
-	}
-
 	@Override
-	public void handle(SlashCommandInteractionEvent event){
+	public void handle(SlashCommandInteractionEvent event, ServerData serverData){
 
 		//process may take more than 3 seconds, so set bot in thinking mode (15mins to reply)
 		event.deferReply().queue();
@@ -80,9 +73,9 @@ public class SlashEventNewHandler implements SlashHandler{
 		try{
 
 			//create the event
-			ScheduledEventAction scheduledEvent = this.serverData.getGuild().createScheduledEvent(
+			ScheduledEventAction scheduledEvent = serverData.getGuild().createScheduledEvent(
 				title,
-				this.serverData.getVoiceEventChannel(),
+				serverData.getVoiceEventChannel(),
 				dateTime
 			);
 			scheduledEvent = scheduledEvent.setDescription(description);
@@ -104,7 +97,7 @@ public class SlashEventNewHandler implements SlashHandler{
 					//send the messages
 					hook.sendMessage("Event created: " + eventId).and(
 						hook.sendMessage(
-							MarkdownUtil.maskedLink(eventId, "https://discord.com/events/" + this.serverData.getGuildId() + "/" + eventId)
+							MarkdownUtil.maskedLink(eventId, "https://discord.com/events/" + serverData.getGuildId() + "/" + eventId)
 						)
 					).queue(
 						(success1) -> {},

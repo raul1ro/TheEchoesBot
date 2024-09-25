@@ -1,6 +1,6 @@
 package com.bot.theechoesbot.core;
 
-import com.bot.theechoesbot.core.listener.BotListener;
+import com.bot.theechoesbot.listener.BotListener;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import org.slf4j.Logger;

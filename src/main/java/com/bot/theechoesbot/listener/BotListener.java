@@ -1,18 +1,17 @@
-package com.bot.theechoesbot.core.listener;
+package com.bot.theechoesbot.listener;
 
-import com.bot.theechoesbot.core.service.RegisterService;
-import com.bot.theechoesbot.core.handler.ButtonInteractionHandler;
-import com.bot.theechoesbot.core.handler.EventCreateHandler;
-import com.bot.theechoesbot.core.handler.ModalInteractionHandler;
-import com.bot.theechoesbot.core.handler.slash.SlashEventNewHandler;
-import com.bot.theechoesbot.core.handler.slash.SlashEventStartHandler;
-import com.bot.theechoesbot.core.handler.slash.SlashRollHandler;
-import com.bot.theechoesbot.core.handler.slash.template.SlashHandler;
-import com.bot.theechoesbot.core.service.DiscordUtil;
-import com.bot.theechoesbot.object.ServerData;
+import com.bot.theechoesbot.service.RegisterService;
+import com.bot.theechoesbot.handler.ButtonInteractionHandler;
+import com.bot.theechoesbot.handler.EventCreateHandler;
+import com.bot.theechoesbot.handler.ModalInteractionHandler;
+import com.bot.theechoesbot.handler.slash.SlashEventNewHandler;
+import com.bot.theechoesbot.handler.slash.SlashEventStartHandler;
+import com.bot.theechoesbot.handler.slash.SlashRollHandler;
+import com.bot.theechoesbot.handler.slash.template.SlashHandler;
+import com.bot.theechoesbot.service.DiscordUtil;
+import com.bot.theechoesbot.entity.ServerData;
 import net.dv8tion.jda.api.events.guild.scheduledevent.ScheduledEventCreateEvent;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
-import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.session.ReadyEvent;
@@ -52,17 +51,19 @@ public class BotListener extends ListenerAdapter{
 		//noinspection DataFlowIssue
 		this.serverData = new ServerData(
 			Long.parseLong(env.getProperty("discord.guildId")),
-			Long.parseLong(env.getProperty("discord.voiceEventId")),
-			Long.parseLong(env.getProperty("discord.scheduleId")),
-			Long.parseLong(env.getProperty("discord.announcesId")),
-			Long.parseLong(env.getProperty("discord.registerId"))
+			Long.parseLong(env.getProperty("discord.channel.news.announcesId")),
+			Long.parseLong(env.getProperty("discord.channel.voice.eventId")),
+			Long.parseLong(env.getProperty("discord.channel.text.scheduleId")),
+			Long.parseLong(env.getProperty("discord.channel.text.registerId")),
+			Long.parseLong(env.getProperty("discord.role.internId")),
+			Long.parseLong(env.getProperty("discord.role.memberId"))
 		);
 
 		this.slashRollHandler = new SlashRollHandler();
-		this.slashEventNewHandler = new SlashEventNewHandler(serverData);
-		this.slashEventStartHandler = new SlashEventStartHandler(serverData);
+		this.slashEventNewHandler = new SlashEventNewHandler();
+		this.slashEventStartHandler = new SlashEventStartHandler();
 
-		this.eventCreateHandler = new EventCreateHandler(serverData);
+		this.eventCreateHandler = new EventCreateHandler();
 		this.buttonInteractionHandler = new ButtonInteractionHandler(this.registerService);
 		this.modalInteractionHandler = new ModalInteractionHandler(this.registerService);
 
@@ -76,12 +77,12 @@ public class BotListener extends ListenerAdapter{
 		try{
 
 			//initialize the channels instances
-			serverData.initChannels(event.getJDA());
+			serverData.init(event.getJDA());
 
 			//initialize discord stuffs
 			DiscordUtil discordUtil = new DiscordUtil();
 			discordUtil.initCommands(event.getJDA());
-			discordUtil.initRegister(serverData.getRegisterChannel());
+			discordUtil.initRegister(serverData.getTextRegisterChannel());
 
 		}catch(Exception e){
 
@@ -96,9 +97,9 @@ public class BotListener extends ListenerAdapter{
 	public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event){
 
 		switch(event.getName()){
-			case "roll": slashRollHandler.handle(event); break;
-			case "event-new": slashEventNewHandler.handle(event); break;
-			case "event-start": slashEventStartHandler.handle(event); break;
+			case "roll": slashRollHandler.handle(event, serverData); break;
+			case "event-new": slashEventNewHandler.handle(event, serverData); break;
+			case "event-start": slashEventStartHandler.handle(event, serverData); break;
 			default: {
 				event.reply("Unknown command").setEphemeral(true).queue();
 				logger.warn("Unknown command: " + event.getName());
@@ -110,21 +111,17 @@ public class BotListener extends ListenerAdapter{
 
 	@Override
 	public void onScheduledEventCreate(@NotNull ScheduledEventCreateEvent event){
-		eventCreateHandler.handle(event);
+		eventCreateHandler.handle(event, serverData);
 	}
 
 	@Override
 	public void onButtonInteraction(@NotNull ButtonInteractionEvent event){
-		buttonInteractionHandler.handle(event);
+		buttonInteractionHandler.handle(event, serverData);
 	}
 
 	@Override
 	public void onModalInteraction(@NotNull ModalInteractionEvent event){
-		modalInteractionHandler.handle(event);
+		modalInteractionHandler.handle(event, serverData);
 	}
 
-	@Override
-	public void onCommandAutoCompleteInteraction(@NotNull CommandAutoCompleteInteractionEvent event){
-		super.onCommandAutoCompleteInteraction(event);
-	}
 }

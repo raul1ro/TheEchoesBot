@@ -1,4 +1,4 @@
-package com.bot.theechoesbot.core.service.template;
+package com.bot.theechoesbot.service.template;
 
 /**
  * Crawl data from the game

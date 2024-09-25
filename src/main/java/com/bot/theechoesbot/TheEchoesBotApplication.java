@@ -8,8 +8,6 @@ public class TheEchoesBotApplication{
 
 	public static void main(String[] args){
 		SpringApplication.run(TheEchoesBotApplication.class, args);
-
-
 	}
 
 }

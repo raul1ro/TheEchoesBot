@@ -1,8 +1,8 @@
-package com.bot.theechoesbot.core.handler;
+package com.bot.theechoesbot.handler;
 
 import com.bot.theechoesbot.core.Globals;
-import com.bot.theechoesbot.core.handler.template.Handler;
-import com.bot.theechoesbot.object.ServerData;
+import com.bot.theechoesbot.handler.template.Handler;
+import com.bot.theechoesbot.entity.ServerData;
 import net.dv8tion.jda.api.entities.ScheduledEvent;
 import net.dv8tion.jda.api.events.guild.scheduledevent.ScheduledEventCreateEvent;
 import net.dv8tion.jda.api.utils.MarkdownUtil;
@@ -19,16 +19,10 @@ public class EventCreateHandler implements Handler<ScheduledEventCreateEvent>{
 
 	private final static Logger logger = LoggerFactory.getLogger(EventCreateHandler.class);
 
-	private final ServerData serverData;
-
 	private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("EEEE (dd MMM)");
 
-	public EventCreateHandler(ServerData serverData){
-		this.serverData = serverData;
-	}
-
 	@Override
-	public void handle(ScheduledEventCreateEvent event){
+	public void handle(ScheduledEventCreateEvent event, ServerData serverData){
 
 		try{
 
@@ -40,9 +34,9 @@ public class EventCreateHandler implements Handler<ScheduledEventCreateEvent>{
 			String message = "- "
 				+ startDay
 				+ " - "
-				+ MarkdownUtil.maskedLink(scheduledEvent.getName(), "https://discord.com/events/" + this.serverData.getGuildId() + "/" + scheduledEvent.getId());
+				+ MarkdownUtil.maskedLink(scheduledEvent.getName(), "https://discord.com/events/" + serverData.getGuildId() + "/" + scheduledEvent.getId());
 
-			this.serverData.getScheduleChannel().sendMessage(message).queue();
+			serverData.getTextScheduleChannel().sendMessage(message).queue();
 
 		}catch(Exception e){
 			logger.error("Error adding the event in schedule", e);
