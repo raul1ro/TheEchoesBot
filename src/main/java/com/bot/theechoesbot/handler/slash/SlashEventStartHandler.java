@@ -1,11 +1,11 @@
 package com.bot.theechoesbot.handler.slash;
 
+import com.bot.theechoesbot.core.Cache;
 import com.bot.theechoesbot.handler.slash.template.SlashHandler;
 import com.bot.theechoesbot.entity.ServerData;
 import net.dv8tion.jda.api.entities.ScheduledEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
-import net.dv8tion.jda.api.utils.MarkdownUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,12 +25,8 @@ public class SlashEventStartHandler implements SlashHandler{
 			//defer reply
 			event.deferReply().queue();
 
+			//get the event id input
 			String eventId = event.getOption("event_id").getAsString();
-			String message = null;
-			OptionMapping messageOption = event.getOption("message");
-			if(messageOption != null){
-				message = messageOption.getAsString();
-			}
 
 			//get the schedule and validate it
 			ScheduledEvent scheduledEvent = event.getJDA().getScheduledEventById(eventId);
@@ -46,37 +42,28 @@ public class SlashEventStartHandler implements SlashHandler{
 			}
 
 			//modify status to active
-			//and announce it
 			scheduledEvent.getManager()
 				.setStatus(ScheduledEvent.Status.ACTIVE)
-				.and(
-					serverData.getNewsAnnouncesChannel().sendMessage(
-						"@everyone\n" +
-							MarkdownUtil.maskedLink(
-								scheduledEvent.getName(),
-								"https://discord.com/events/" + serverData.getGuildId() + "/" + eventId
-							) +
-							" is starting. Get Ready." +
-							(message != null ? "\n" + message : "")
-					)
-				).queue(
-
-					//reply
+				.queue(
 					(success) -> {
 
 						logger.info("Event started: " + eventId);
-
 						event.getHook().sendMessage("Event started: " + eventId).queue(
 							s -> {},
 							e -> logger.info("Error callback-eventStart: " + eventId, e)
 						);
+
+						//get the message input and save it in cache
+						OptionMapping messageOption = event.getOption("message");
+						if(messageOption != null){
+							Cache.Event.put("start_" + eventId, messageOption.getAsString());
+						}
 
 					},
 					(error) -> {
 						event.getHook().sendMessage("Error: " + error.getMessage()).queue();
 						logger.error("Error starting the event: " + eventId, error);
 					}
-
 				);
 
 		}catch(Exception e){

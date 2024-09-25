@@ -1,11 +1,8 @@
 package com.bot.theechoesbot.listener;
 
-import com.bot.theechoesbot.handler.EventCancelHandler;
+import com.bot.theechoesbot.handler.*;
 import com.bot.theechoesbot.handler.slash.SlashEventCancelHandler;
 import com.bot.theechoesbot.service.RegisterService;
-import com.bot.theechoesbot.handler.ButtonInteractionHandler;
-import com.bot.theechoesbot.handler.EventCreateHandler;
-import com.bot.theechoesbot.handler.ModalInteractionHandler;
 import com.bot.theechoesbot.handler.slash.SlashEventNewHandler;
 import com.bot.theechoesbot.handler.slash.SlashEventStartHandler;
 import com.bot.theechoesbot.handler.slash.SlashRollHandler;
@@ -48,6 +45,9 @@ public class BotListener extends ListenerAdapter{
 
 	private final EventCreateHandler eventCreateHandler;
 	private final EventCancelHandler eventCancelHandler;
+	private final EventCompletHandler eventCompletHandler;
+	private final EventActiveHandler eventActiveHandler;
+
 	private final ButtonInteractionHandler buttonInteractionHandler;
 	private final ModalInteractionHandler modalInteractionHandler;
 
@@ -72,6 +72,9 @@ public class BotListener extends ListenerAdapter{
 
 		this.eventCreateHandler = new EventCreateHandler();
 		this.eventCancelHandler = new EventCancelHandler();
+		this.eventCompletHandler = new EventCompletHandler();
+		this.eventActiveHandler = new EventActiveHandler();
+
 		this.buttonInteractionHandler = new ButtonInteractionHandler(this.registerService);
 		this.modalInteractionHandler = new ModalInteractionHandler(this.registerService);
 
@@ -105,10 +108,10 @@ public class BotListener extends ListenerAdapter{
 	public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event){
 
 		switch(event.getName()){
-			case "roll": slashRollHandler.handle(event, serverData); break;
-			case "event-new": slashEventNewHandler.handle(event, serverData); break;
-			case "event-start": slashEventStartHandler.handle(event, serverData); break;
-			case "event-cancel": slashEventCancelHandler.handle(event, serverData); break;
+			case "roll": this.slashRollHandler.handle(event, serverData); break;
+			case "event-new": this.slashEventNewHandler.handle(event, serverData); break;
+			case "event-start": this.slashEventStartHandler.handle(event, serverData); break;
+			case "event-cancel": this.slashEventCancelHandler.handle(event, serverData); break;
 			default: {
 				event.reply("Unknown command").setEphemeral(true).queue();
 				logger.warn("Unknown command: " + event.getName());
@@ -129,7 +132,9 @@ public class BotListener extends ListenerAdapter{
 		ScheduledEvent.Status status = event.getNewStatus();
 		switch(status){
 
-			case ScheduledEvent.Status.CANCELED -> eventCancelHandler.handle(event, serverData);
+			case ScheduledEvent.Status.ACTIVE -> this.eventActiveHandler.handle(event.getScheduledEvent(), serverData);
+			case ScheduledEvent.Status.COMPLETED -> this.eventCompletHandler.handle(event.getScheduledEvent(), serverData);
+			case ScheduledEvent.Status.CANCELED -> this.eventCancelHandler.handle(event.getScheduledEvent(), serverData);
 
 		}
 

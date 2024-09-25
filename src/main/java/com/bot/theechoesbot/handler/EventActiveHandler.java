@@ -6,17 +6,15 @@ import com.bot.theechoesbot.handler.template.Handler;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.ScheduledEvent;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.utils.MarkdownUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
-/**
- * Implement Handler for ScheduledEventUpdateStatusEvent
- */
-public class EventCancelHandler implements Handler<ScheduledEvent>{
+public class EventActiveHandler implements Handler<ScheduledEvent>{
 
-	private final static Logger logger = LoggerFactory.getLogger(EventCancelHandler.class);
+	private static final Logger logger = LoggerFactory.getLogger(EventActiveHandler.class);
 
 	@Override
 	public void handle(ScheduledEvent event, ServerData serverData){
@@ -36,39 +34,34 @@ public class EventCancelHandler implements Handler<ScheduledEvent>{
 			if(message != null){
 
 				//modify the content
-				//remove the link and replace [] with ~~
 				String content = message.getContentRaw();
-				content = content.substring(0, content.indexOf("]"))
-					.replace("[", "~~") +
-					"~~ - Canceled";
-
-				//find reason in cache and attach it
-				String reason = Cache.Event.getAndRemove("cancel_" + eventId);
-				if(reason != null){
-					content += ". Reason: " + reason + ".";
-				}
+				content = content + " - Ongoing";
 
 				//edit the message
 				message.editMessage(content).queue();
 
-				logger.info("Canceled event was updated in schedule. " + eventId);
+				logger.info("Active event was updated in schedule. " + eventId);
 
 				/* announce it */
 
-				//split the date and title
-				String date = content.substring(2, content.indexOf(")")+1);
-				String title = content.substring(content.indexOf("~~")+2, content.lastIndexOf("~~"));
-
 				//build the message
-				String announceMessage = "@everyone\nThe event " + title + " from " + date + " was canceled.";
-				if(reason != null){
-					announceMessage += " Reason: " + reason + ".";
+				String announceMessage = "@everyone\n" +
+					MarkdownUtil.maskedLink(
+						event.getName(),
+						"https://discord.com/events/" + serverData.getGuildId() + "/" + eventId
+					) +
+					" is starting. Get Ready.";
+
+				//find message in cache and attach it
+				String startMessage = Cache.Event.getAndRemove("start_" + eventId);
+				if(startMessage != null){
+					announceMessage += "\n" + startMessage;
 				}
 
 				//send it
 				serverData.getNewsAnnouncesChannel().sendMessage(announceMessage).queue();
 
-				logger.info("Canceled event was announced. " + eventId);
+				logger.info("Start event was announced. " + eventId);
 
 			}
 

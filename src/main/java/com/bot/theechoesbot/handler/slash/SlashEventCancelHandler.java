@@ -42,28 +42,27 @@ public class SlashEventCancelHandler implements SlashHandler{
 			}
 
 			//set status to cancel
-			//-> reply to user
 			scheduledEvent.getManager()
 				.setStatus(ScheduledEvent.Status.CANCELED)
 				.queue(
-					(s) -> {
+					(success) -> {
 
 						logger.info("Event canceled: " + eventId);
 						event.getHook().sendMessage("Event canceled: " + eventId).queue(
-							s1 -> {},
+							s -> {},
 							e -> logger.info("Error callback-eventCancel: " + eventId, e)
 						);
 
 						//get the reason from input and save it in cache
 						OptionMapping reasonOption = event.getOption("reason");
 						if(reasonOption != null){
-							Cache.Event.put(eventId, reasonOption.getAsString());
+							Cache.Event.put("cancel_" + eventId, reasonOption.getAsString());
 						}
 
 					},
-					(e) -> {
-						event.getHook().sendMessage("Error: " + e.getMessage()).queue();
-						logger.error("Error canceling the event: " + eventId, e);
+					(error) -> {
+						event.getHook().sendMessage("Error: " + error.getMessage()).queue();
+						logger.error("Error canceling the event: " + eventId, error);
 					}
 				);
 
