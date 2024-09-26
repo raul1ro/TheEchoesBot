@@ -1,5 +1,6 @@
 package com.bot.theechoesbot.listener;
 
+import com.bot.theechoesbot.core.Core;
 import com.bot.theechoesbot.handler.*;
 import com.bot.theechoesbot.handler.slash.SlashEventCancelHandler;
 import com.bot.theechoesbot.service.RegisterService;
@@ -16,6 +17,7 @@ import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.session.ReadyEvent;
+import net.dv8tion.jda.api.events.session.ShutdownEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -57,6 +59,7 @@ public class BotListener extends ListenerAdapter{
 		//noinspection DataFlowIssue
 		this.serverData = new ServerData(
 			Long.parseLong(env.getProperty("discord.guildId")),
+			Long.parseLong(env.getProperty("discord.bot.channelId")),
 			Long.parseLong(env.getProperty("discord.channel.news.announcesId")),
 			Long.parseLong(env.getProperty("discord.channel.voice.eventId")),
 			Long.parseLong(env.getProperty("discord.channel.text.scheduleId")),
@@ -91,9 +94,8 @@ public class BotListener extends ListenerAdapter{
 			serverData.init(event.getJDA());
 
 			//initialize discord stuffs
-			DiscordUtil discordUtil = new DiscordUtil();
-			discordUtil.initCommands(event.getJDA());
-			discordUtil.initRegister(serverData.getTextRegisterChannel());
+			DiscordUtil.initCommands(event.getJDA());
+			DiscordUtil.initRegister(serverData.getTextRegisterChannel());
 
 		}catch(Exception e){
 
@@ -102,6 +104,12 @@ public class BotListener extends ListenerAdapter{
 
 		}
 
+	}
+
+	@Override
+	public void onShutdown(@NotNull ShutdownEvent event){
+		logger.warn("Bot is shutting down. Reference: " + this);
+		DiscordUtil.sendMessage("Bot has stopped.", serverData.getBotChannelId(), Core.getBotToken());
 	}
 
 	@Override

@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
 public class ServerData{
 
 	private final long guildId;
+	private final long botChannelId;
 	private final long channelNewsAnnouncesId;
 	private final long channelVoiceEventId;
 	private final long channelTextScheduleId;
@@ -18,6 +19,7 @@ public class ServerData{
 	private final long roleMemberId;
 
 	private Guild guild;
+	private TextChannel botChannel;
 	private NewsChannel newsAnnouncesChannel;
 	private VoiceChannel voiceEventChannel;
 	private TextChannel textScheduleChannel;
@@ -26,11 +28,12 @@ public class ServerData{
 	private Role memberRole;
 
 	public ServerData(
-		long guildId,
+		long guildId, long botChannelId,
 		long channelNewsAnnouncesId, long channelVoiceEventId, long channelTextScheduleId, long channelTextRegisterId,
 		long roleInternId, long roleMemberId
 	){
 		this.guildId = guildId;
+		this.botChannelId = botChannelId;
 		this.channelNewsAnnouncesId = channelNewsAnnouncesId;
 		this.channelVoiceEventId = channelVoiceEventId;
 		this.channelTextScheduleId = channelTextScheduleId;
@@ -42,6 +45,7 @@ public class ServerData{
 	@SuppressWarnings("DataFlowIssue")
 	public void init(JDA jda){
 		guild = jda.getGuildById(guildId);
+		botChannel = guild.getTextChannelById(botChannelId);
 		newsAnnouncesChannel = guild.getNewsChannelById(channelNewsAnnouncesId);
 		voiceEventChannel = guild.getVoiceChannelById(channelVoiceEventId);
 		textScheduleChannel = guild.getTextChannelById(channelTextScheduleId);
@@ -50,46 +54,36 @@ public class ServerData{
 		memberRole = guild.getRoleById(roleMemberId);
 	}
 
-	public long getGuildId(){ return guildId; }
+	public TextChannel getBotChannel(){ return botChannel; }
+
+	public long getBotChannelId(){ return botChannelId; }
 
 	public long getChannelNewsAnnouncesId(){ return channelNewsAnnouncesId; }
 
-	public long getChannelVoiceEventId(){ return channelVoiceEventId; }
+	public long getChannelTextRegisterId(){ return channelTextRegisterId; }
 
 	public long getChannelTextScheduleId(){ return channelTextScheduleId; }
 
-	public long getChannelTextRegisterId(){ return channelTextRegisterId; }
+	public long getChannelVoiceEventId(){ return channelVoiceEventId; }
+
+	public Guild getGuild(){ return guild; }
+
+	public long getGuildId(){ return guildId; }
+
+	public Role getInternRole(){ return internRole; }
+
+	public Role getMemberRole(){ return memberRole; }
+
+	public NewsChannel getNewsAnnouncesChannel(){ return newsAnnouncesChannel; }
 
 	public long getRoleInternId(){ return roleInternId; }
 
 	public long getRoleMemberId(){ return roleMemberId; }
 
-	public Guild getGuild(){ return guild; }
-
-	public void setGuild(Guild guild){ this.guild = guild; }
-
-	public NewsChannel getNewsAnnouncesChannel(){ return newsAnnouncesChannel; }
-
-	public void setNewsAnnouncesChannel(NewsChannel newsAnnouncesChannel){ this.newsAnnouncesChannel = newsAnnouncesChannel; }
-
-	public VoiceChannel getVoiceEventChannel(){ return voiceEventChannel; }
-
-	public void setVoiceEventChannel(VoiceChannel voiceEventChannel){ this.voiceEventChannel = voiceEventChannel; }
+	public TextChannel getTextRegisterChannel(){ return textRegisterChannel; }
 
 	public TextChannel getTextScheduleChannel(){ return textScheduleChannel; }
 
-	public void setTextScheduleChannel(TextChannel textScheduleChannel){ this.textScheduleChannel = textScheduleChannel; }
-
-	public TextChannel getTextRegisterChannel(){ return textRegisterChannel; }
-
-	public void setTextRegisterChannel(TextChannel textRegisterChannel){ this.textRegisterChannel = textRegisterChannel; }
-
-	public Role getInternRole(){ return internRole; }
-
-	public void setInternRole(Role internRole){ this.internRole = internRole; }
-
-	public Role getMemberRole(){ return memberRole; }
-
-	public void setMemberRole(Role memberRole){ this.memberRole = memberRole; }
+	public VoiceChannel getVoiceEventChannel(){ return voiceEventChannel; }
 
 }

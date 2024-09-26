@@ -1,5 +1,7 @@
 package com.bot.theechoesbot.service;
 
+import com.bot.theechoesbot.core.Globals;
+import com.fasterxml.jackson.databind.JsonNode;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -9,6 +11,10 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
+import okhttp3.MediaType;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,7 +30,7 @@ public class DiscordUtil{
 	/**
 	 * Update the commands
 	 */
-	public void initCommands(JDA jda){
+	public static void initCommands(JDA jda){
 
 		jda.updateCommands()
 			.addCommands(
@@ -121,7 +127,7 @@ public class DiscordUtil{
 	 * Create a message with buttons for register
 	 */
 	//tip: it would be nice to clear the channel before init
-	public void initRegister(TextChannel registerChannel){
+	public static void initRegister(TextChannel registerChannel){
 
 		try{
 
@@ -162,6 +168,44 @@ public class DiscordUtil{
 			logger.error("Failed to initRegister.", e);
 			throw e;
 
+		}
+
+	}
+
+	/**
+	 * Send a message directly, without any library.
+	 */
+	public static boolean sendMessage(String text, long channelId, String botToken){
+
+		try{
+
+			RequestBody body = RequestBody.create(
+				"{\"content\":\"" + text + "\"}",
+				MediaType.parse("application/json")
+			);
+
+			Request request = new Request.Builder()
+				.url("https://discord.com/api/v10/channels/" + channelId + "/messages")
+				.method("POST", body)
+				.addHeader("Content-Type", "application/json")
+				.addHeader("Authorization", "Bot " + botToken)
+				.build();
+
+			try(Response response = Globals.HTTP_CLIENT.newCall(request).execute()){
+
+				int responseCode = response.code();
+
+				//check response
+				if(responseCode == 200){ return true; }
+
+				//noinspection ConstantConditions
+				throw new Exception("code: " + responseCode + " - status: " + response.message() + " - body: " + response.body().string());
+
+			}
+
+		}catch(Exception e){
+			logger.error("Failed to send message.", e);
+			return false;
 		}
 
 	}

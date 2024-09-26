@@ -13,8 +13,9 @@ public class Core{
 
 	private final static Logger logger = LoggerFactory.getLogger(Core.class);
 
-	private final BotListener bot;
-	private final JDA jda;
+	private static String BotToken;
+	private static BotListener Bot;
+	private static JDA JDAClient;
 
 	private Core(
 		@Value("${discord.bot.token}") String botToken,
@@ -23,12 +24,12 @@ public class Core{
 
 		try{
 
-			//create the bot
-			this.bot = bot;
+			BotToken = botToken;
+			Bot = bot;
 
 			//create the client
-			this.jda = JDABuilder.createDefault(botToken)
-				.addEventListeners(this.bot)
+			JDAClient = JDABuilder.createDefault(botToken)
+				.addEventListeners(Bot)
 				.build();
 
 		}catch(Exception e){
@@ -40,7 +41,10 @@ public class Core{
 
 	}
 
-	public BotListener getBot(){ return bot; }
-	public JDA getJda(){ return jda; }
+	public static BotListener getBot(){ return Bot; }
+
+	public static String getBotToken(){ return BotToken; }
+
+	public static JDA getJDAClient(){ return JDAClient; }
 
 }
