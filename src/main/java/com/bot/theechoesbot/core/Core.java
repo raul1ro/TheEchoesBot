@@ -8,6 +8,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.util.concurrent.*;
+
 @Component
 public class Core{
 
@@ -27,8 +29,21 @@ public class Core{
 			BotToken = botToken;
 			Bot = bot;
 
+			ScheduledThreadPoolExecutor scheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(3, Thread.ofVirtual().factory());
+			ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(
+				3, 5,
+				1, TimeUnit.MINUTES,
+				new LinkedBlockingQueue<>(),
+				Thread.ofVirtual().factory()
+			);
+
 			//create the client
 			JDAClient = JDABuilder.createDefault(botToken)
+				.setGatewayPool(scheduledThreadPoolExecutor, true)
+				.setRateLimitScheduler(scheduledThreadPoolExecutor, true)
+				.setRateLimitElastic(threadPoolExecutor, true)
+				.setCallbackPool(threadPoolExecutor, true)
+				.setEventPool(threadPoolExecutor, true)
 				.addEventListeners(Bot)
 				.build();
 

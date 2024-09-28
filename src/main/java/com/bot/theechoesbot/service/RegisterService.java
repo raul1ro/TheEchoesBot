@@ -36,14 +36,14 @@ public class RegisterService{
 			guild.addRoleToMember(
 				member,
 				internRole
-			).queue();
+			).complete();
 
 			//reply
-			event.getHook().sendMessage("Register successfully.\nRole: " + internRole.getName() + "\nIf the registration is wrong contact <@328569043974094849> or <@658643411120685066>.").queue();
+			event.getHook().sendMessage("Register successfully.\nRole: " + internRole.getName() + "\nIf the registration is wrong contact <@328569043974094849>.").queue();
 			logger.info("User registered as Intern: " + member.getEffectiveName());
 
 		}catch(Exception e){
-			event.getHook().sendMessage("Error registering as Intern.").queue();
+			event.getHook().sendMessage("Error registering as Intern. Contact <@328569043974094849>.").queue();
 			logger.error("Error registering intern.", e);
 		}
 
@@ -73,7 +73,7 @@ public class RegisterService{
 		}catch(Exception e){
 
 			logger.error("Error initializing registration as member.", e);
-			event.reply("Error initializing registration as member.").setEphemeral(true).queue();
+			event.reply("Error initializing registration as member. Contact <@328569043974094849>.").setEphemeral(true).queue();
 
 		}
 
@@ -93,7 +93,7 @@ public class RegisterService{
 			//get the user data and validate it.
 			String[] userData = gameCrawler.getUserData(characterName);
 			if(userData == null){
-				event.getHook().sendMessage("The character \"" + characterName + "\" not found in guild.\nIf you think this is an error contact <@328569043974094849> or <@658643411120685066>.").setEphemeral(true).queue();
+				event.getHook().sendMessage("The character \"" + characterName + "\" not found in guild.\nIf you think this is an error contact <@328569043974094849>.").setEphemeral(true).queue();
 				return;
 			}
 
@@ -103,29 +103,29 @@ public class RegisterService{
 
 			//if the character from guild is no longer Bober - that means he was already registered.
 			if(!guildRank.equals("Bober")){
-				event.getHook().sendMessage("The character \"" + characterName + "\" is already registered.\nIf you think this is an error contact <@328569043974094849> or <@658643411120685066>.").setEphemeral(true).queue();
+				event.getHook().sendMessage("The character \"" + characterName + "\" is already registered.\nIf you think this is an error contact <@328569043974094849>.").setEphemeral(true).queue();
 				return;
 			}
 
 			//if the nickname is taken by another member
-			boolean memberFound = !(guild.getMembersByNickname(characterName, true).isEmpty());
+			boolean memberFound = !(guild.retrieveMembersByPrefix(characterName, 1).get().isEmpty());
 			if(memberFound){
-				event.getHook().sendMessage("The character \"" + characterName + "\" is already registered. If you think this is an error contact <@328569043974094849> or <@658643411120685066>.").setEphemeral(true).queue();
+				event.getHook().sendMessage("The character \"" + characterName + "\" is already registered. If you think this is an error contact <@328569043974094849>").setEphemeral(true).queue();
 				return;
 			}
 
 			//set nickname and role
-			guild.modifyNickname(member, characterName).queue();
-			guild.addRoleToMember(member, memberRole).queue();
+			guild.modifyNickname(member, characterName).complete();
+			guild.addRoleToMember(member, memberRole).complete();
 
 			//reply
-			event.getHook().sendMessage("Register successfully.\nNickname: " + characterName + "\nRole: " + memberRole.getName() + "\nIf the registration is wrong contact <@328569043974094849> or <@658643411120685066>.").setEphemeral(true).queue();
-			logger.info("User registered as Member: " + member.getNickname());
+			event.getHook().sendMessage("Register successfully.\nNickname: " + characterName + "\nRole: " + memberRole.getName() + "\nIf the registration is wrong contact <@328569043974094849>.").setEphemeral(true).queue();
+			logger.info("User registered as Member: " + member.getEffectiveName() + " (" + characterName + ")");
 
 		}catch(Exception e){
 
 			logger.error("Error registering member.", e);
-			event.getHook().sendMessage("Error registering as Member.").setEphemeral(true).queue();
+			event.getHook().sendMessage("Error registering as Member. Contact <@328569043974094849>.").setEphemeral(true).queue();
 
 		}
 

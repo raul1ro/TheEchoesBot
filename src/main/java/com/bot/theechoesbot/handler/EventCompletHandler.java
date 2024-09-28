@@ -1,6 +1,5 @@
 package com.bot.theechoesbot.handler;
 
-import com.bot.theechoesbot.core.Cache;
 import com.bot.theechoesbot.entity.ServerData;
 import com.bot.theechoesbot.handler.template.Handler;
 import net.dv8tion.jda.api.entities.Message;

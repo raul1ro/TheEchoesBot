@@ -29,7 +29,7 @@ public class SlashEventStartHandler implements SlashHandler{
 			String eventId = event.getOption("event_id").getAsString();
 
 			//get the schedule and validate it
-			ScheduledEvent scheduledEvent = event.getJDA().getScheduledEventById(eventId);
+			ScheduledEvent scheduledEvent = serverData.getGuild().retrieveScheduledEventById(eventId).complete();
 			if(scheduledEvent == null){
 				event.getHook().sendMessage("Could not find event with id " + eventId).queue();
 				logger.warn("Event not found: " + eventId);

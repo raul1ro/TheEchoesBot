@@ -1,5 +1,6 @@
 package com.bot.theechoesbot.service;
 
+import com.bot.theechoesbot.core.Core;
 import com.bot.theechoesbot.core.Globals;
 import com.fasterxml.jackson.databind.JsonNode;
 import net.dv8tion.jda.api.JDA;
@@ -152,7 +153,7 @@ public class DiscordUtil{
 					- Intern - you are not in guild. Limited access.
 					- Member - you are in the guild. Full access.
 	
-					**For any problem please contact <@328569043974094849> or <@658643411120685066>.**
+					**For any problem please contact <@328569043974094849>.**
 					"""
 				).setActionRow(internButton, memberButton)
 				.build();
@@ -162,6 +163,8 @@ public class DiscordUtil{
 				s -> logger.info("Register message was created."),
 				e -> logger.error("Failed to create the register message.", e)
 			);
+
+			Core.getJDAClient().shutdown();
 
 		}catch(Exception e){
 

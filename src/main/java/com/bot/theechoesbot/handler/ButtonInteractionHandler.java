@@ -34,7 +34,7 @@ public class ButtonInteractionHandler implements Handler<ButtonInteractionEvent>
 		//get the roles of user and validate it
 		List<Role> roles = event.getMember().getRoles();
 		if(!roles.isEmpty()){
-			event.reply("You are already registered.\nIf you think this is an error contact <@328569043974094849> or <@658643411120685066>.").setEphemeral(true).queue();
+			event.reply("You are already registered.\nIf you think this is an error contact <@328569043974094849>.").setEphemeral(true).queue();
 			logger.info("User already registered: " + member.getEffectiveName());
 			return;
 		}
