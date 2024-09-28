@@ -1,8 +1,6 @@
 package com.bot.theechoesbot.service;
 
-import com.bot.theechoesbot.core.Core;
 import com.bot.theechoesbot.core.Globals;
-import com.fasterxml.jackson.databind.JsonNode;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -163,8 +161,6 @@ public class DiscordUtil{
 				s -> logger.info("Register message was created."),
 				e -> logger.error("Failed to create the register message.", e)
 			);
-
-			Core.getJDAClient().shutdown();
 
 		}catch(Exception e){
 
