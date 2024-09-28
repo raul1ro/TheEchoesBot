@@ -47,7 +47,7 @@ public class BotListener extends ListenerAdapter{
 
 	private final EventCreateHandler eventCreateHandler;
 	private final EventCancelHandler eventCancelHandler;
-	private final EventCompletHandler eventCompletHandler;
+	private final EventCompleteHandler eventCompleteHandler;
 	private final EventActiveHandler eventActiveHandler;
 
 	private final ButtonInteractionHandler buttonInteractionHandler;
@@ -75,7 +75,7 @@ public class BotListener extends ListenerAdapter{
 
 		this.eventCreateHandler = new EventCreateHandler();
 		this.eventCancelHandler = new EventCancelHandler();
-		this.eventCompletHandler = new EventCompletHandler();
+		this.eventCompleteHandler = new EventCompleteHandler();
 		this.eventActiveHandler = new EventActiveHandler();
 
 		this.buttonInteractionHandler = new ButtonInteractionHandler(this.registerService);
@@ -141,7 +141,7 @@ public class BotListener extends ListenerAdapter{
 		switch(status){
 
 			case ScheduledEvent.Status.ACTIVE -> this.eventActiveHandler.handle(event.getScheduledEvent(), serverData);
-			case ScheduledEvent.Status.COMPLETED -> this.eventCompletHandler.handle(event.getScheduledEvent(), serverData);
+			case ScheduledEvent.Status.COMPLETED -> this.eventCompleteHandler.handle(event.getScheduledEvent(), serverData);
 			case ScheduledEvent.Status.CANCELED -> this.eventCancelHandler.handle(event.getScheduledEvent(), serverData);
 
 		}

@@ -10,9 +10,9 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
-public class EventCompletHandler implements Handler<ScheduledEvent>{
+public class EventCompleteHandler implements Handler<ScheduledEvent>{
 
-	private final static Logger logger = LoggerFactory.getLogger(EventCompletHandler.class);
+	private final static Logger logger = LoggerFactory.getLogger(EventCompleteHandler.class);
 
 	@Override
 	public void handle(ScheduledEvent event, ServerData serverData){
