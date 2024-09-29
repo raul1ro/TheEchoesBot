@@ -35,7 +35,8 @@ public class SlashEventCancelHandler implements SlashHandler{
 				logger.warn("Event not found: " + eventId);
 				return;
 			}
-			if(scheduledEvent.getStatus() != ScheduledEvent.Status.SCHEDULED){
+			ScheduledEvent.Status currentStatus = scheduledEvent.getStatus();
+			if(currentStatus != ScheduledEvent.Status.SCHEDULED && currentStatus != ScheduledEvent.Status.ACTIVE){
 				event.getHook().sendMessage("The event can't be canceled.").queue();
 				logger.warn("The event can't be canceled: " + eventId);
 				return;

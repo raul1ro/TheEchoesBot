@@ -4,7 +4,6 @@
 <code>JDA 5.1.0</code>
 <code>OkHttp3 4.12.0</code>
 <code>Jackson Databind 2.14.0</code>
-<hr>
 <p>The Echoes Bot is a Discord application used in TheEchoes server.</p>
 <p>Features:</p>
 <ul>
