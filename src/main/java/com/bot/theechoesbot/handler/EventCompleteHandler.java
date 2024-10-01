@@ -1,5 +1,6 @@
 package com.bot.theechoesbot.handler;
 
+import com.bot.theechoesbot.core.Cache;
 import com.bot.theechoesbot.entity.ServerData;
 import com.bot.theechoesbot.handler.template.Handler;
 import net.dv8tion.jda.api.entities.Message;
@@ -33,9 +34,17 @@ public class EventCompleteHandler implements Handler<ScheduledEvent>{
 
 				//modify the content
 				String content = message.getContentRaw();
-				content = content.substring(0, content.indexOf("]"))
-					.replace("[", "") +
-					" - Completed";
+				content = content.substring(0, content.lastIndexOf("]"))
+					.replace("[", "");
+
+				//check if there is a cancel reason in cache
+				//otherwise just simply type Completed
+				String reason = Cache.Event.getAndRemove("cancel_" + eventId);
+				if(reason != null){
+					content += " - Canceled. Reason: " + reason + ".";
+				}else{
+					content += " - Completed.";
+				}
 
 				//edit the message
 				message.editMessage(content).queue();
