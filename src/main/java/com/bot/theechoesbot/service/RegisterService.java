@@ -42,6 +42,8 @@ public class RegisterService{
 			event.getHook().sendMessage("Register successfully.\nRole: " + internRole.getName() + "\nIf the registration is wrong contact <@328569043974094849>.").queue();
 			logger.info("User registered as Intern: " + member.getEffectiveName());
 
+
+
 		}catch(Exception e){
 			event.getHook().sendMessage("Error registering as Intern. Contact <@328569043974094849>.").queue();
 			logger.error("Error registering intern.", e);

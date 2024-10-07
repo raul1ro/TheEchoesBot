@@ -35,7 +35,6 @@ public class BotListener extends ListenerAdapter{
 
 	private final static Logger logger = LoggerFactory.getLogger(BotListener.class);
 
-	private final ServerData serverData;
 
 	@SuppressWarnings("FieldCanBeLocal")
 	private final RegisterService registerService = new RegisterService();
@@ -53,20 +52,7 @@ public class BotListener extends ListenerAdapter{
 	private final ButtonInteractionHandler buttonInteractionHandler;
 	private final ModalInteractionHandler modalInteractionHandler;
 
-	@Autowired
-	public BotListener(Environment env){
-
-		//noinspection DataFlowIssue
-		this.serverData = new ServerData(
-			Long.parseLong(env.getProperty("discord.guildId")),
-			Long.parseLong(env.getProperty("discord.bot.channelId")),
-			Long.parseLong(env.getProperty("discord.channel.news.announcesId")),
-			Long.parseLong(env.getProperty("discord.channel.voice.eventId")),
-			Long.parseLong(env.getProperty("discord.channel.text.scheduleId")),
-			Long.parseLong(env.getProperty("discord.channel.text.registerId")),
-			Long.parseLong(env.getProperty("discord.role.internId")),
-			Long.parseLong(env.getProperty("discord.role.memberId"))
-		);
+	public BotListener(){
 
 		this.slashRollHandler = new SlashRollHandler();
 		this.slashEventNewHandler = new SlashEventNewHandler();
@@ -91,11 +77,11 @@ public class BotListener extends ListenerAdapter{
 		try{
 
 			//initialize the channels instances
-			serverData.init(event.getJDA());
+			Core.getServerData().init(event.getJDA());
 
 			//initialize discord stuffs
 			DiscordUtil.initCommands(event.getJDA());
-			DiscordUtil.initRegister(serverData.getTextRegisterChannel());
+			DiscordUtil.initRegister(Core.getServerData().getTextRegisterChannel());
 
 		}catch(Exception e){
 
@@ -109,17 +95,17 @@ public class BotListener extends ListenerAdapter{
 	@Override
 	public void onShutdown(@NotNull ShutdownEvent event){
 		logger.warn("Bot is shutting down. Reference: " + this);
-		DiscordUtil.sendMessage("Bot has stopped.", serverData.getBotChannelId(), Core.getBotToken());
+		DiscordUtil.sendMessage("Bot has stopped.", Core.getServerData().getBotChannelId(), Core.getBotToken());
 	}
 
 	@Override
 	public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event){
 
 		switch(event.getName()){
-			case "roll": this.slashRollHandler.handle(event, serverData); break;
-			case "event-new": this.slashEventNewHandler.handle(event, serverData); break;
-			case "event-start": this.slashEventStartHandler.handle(event, serverData); break;
-			case "event-cancel": this.slashEventCancelHandler.handle(event, serverData); break;
+			case "roll": this.slashRollHandler.handle(event); break;
+			case "event-new": this.slashEventNewHandler.handle(event); break;
+			case "event-start": this.slashEventStartHandler.handle(event); break;
+			case "event-cancel": this.slashEventCancelHandler.handle(event); break;
 			default: {
 				event.reply("Unknown command").setEphemeral(true).queue();
 				logger.warn("Unknown command: " + event.getName());
@@ -131,7 +117,7 @@ public class BotListener extends ListenerAdapter{
 
 	@Override
 	public void onScheduledEventCreate(@NotNull ScheduledEventCreateEvent event){
-		eventCreateHandler.handle(event, serverData);
+		eventCreateHandler.handle(event);
 	}
 
 	@Override
@@ -140,9 +126,9 @@ public class BotListener extends ListenerAdapter{
 		ScheduledEvent.Status status = event.getNewStatus();
 		switch(status){
 
-			case ScheduledEvent.Status.ACTIVE -> this.eventActiveHandler.handle(event.getScheduledEvent(), serverData);
-			case ScheduledEvent.Status.COMPLETED -> this.eventCompleteHandler.handle(event.getScheduledEvent(), serverData);
-			case ScheduledEvent.Status.CANCELED -> this.eventCancelHandler.handle(event.getScheduledEvent(), serverData);
+			case ScheduledEvent.Status.ACTIVE -> this.eventActiveHandler.handle(event.getScheduledEvent());
+			case ScheduledEvent.Status.COMPLETED -> this.eventCompleteHandler.handle(event.getScheduledEvent());
+			case ScheduledEvent.Status.CANCELED -> this.eventCancelHandler.handle(event.getScheduledEvent());
 
 		}
 
@@ -150,12 +136,12 @@ public class BotListener extends ListenerAdapter{
 
 	@Override
 	public void onButtonInteraction(@NotNull ButtonInteractionEvent event){
-		buttonInteractionHandler.handle(event, serverData);
+		buttonInteractionHandler.handle(event);
 	}
 
 	@Override
 	public void onModalInteraction(@NotNull ModalInteractionEvent event){
-		modalInteractionHandler.handle(event, serverData);
+		modalInteractionHandler.handle(event);
 	}
 
 }

@@ -1,7 +1,7 @@
 package com.bot.theechoesbot.handler;
 
 import com.bot.theechoesbot.core.Cache;
-import com.bot.theechoesbot.entity.ServerData;
+import com.bot.theechoesbot.core.Core;
 import com.bot.theechoesbot.handler.template.Handler;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.ScheduledEvent;
@@ -17,7 +17,7 @@ public class EventActiveHandler implements Handler<ScheduledEvent>{
 	private static final Logger logger = LoggerFactory.getLogger(EventActiveHandler.class);
 
 	@Override
-	public void handle(ScheduledEvent event, ServerData serverData){
+	public void handle(ScheduledEvent event){
 
 		try{
 
@@ -25,7 +25,7 @@ public class EventActiveHandler implements Handler<ScheduledEvent>{
 			String eventId = event.getId();
 
 			//find the message in schedule
-			TextChannel scheduleChannel = serverData.getTextScheduleChannel();
+			TextChannel scheduleChannel = Core.getServerData().getTextScheduleChannel();
 			List<Message> messageList = scheduleChannel.getHistory().retrievePast(10).complete();
 			Message message = messageList.stream()
 				.filter(m -> m.getContentRaw().contains(eventId))
@@ -48,7 +48,7 @@ public class EventActiveHandler implements Handler<ScheduledEvent>{
 				String announceMessage = "@everyone\n" +
 					MarkdownUtil.maskedLink(
 						event.getName(),
-						"https://discord.com/events/" + serverData.getGuildId() + "/" + eventId
+						"https://discord.com/events/" + Core.getServerData().getGuildId() + "/" + eventId
 					) +
 					" is starting. Get Ready.";
 
@@ -59,7 +59,7 @@ public class EventActiveHandler implements Handler<ScheduledEvent>{
 				}
 
 				//send it
-				serverData.getNewsAnnouncesChannel().sendMessage(announceMessage).queue();
+				Core.getServerData().getNewsAnnouncesChannel().sendMessage(announceMessage).queue();
 
 				logger.info("Start event was announced. " + eventId);
 

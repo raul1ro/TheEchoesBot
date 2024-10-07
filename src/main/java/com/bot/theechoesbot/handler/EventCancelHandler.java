@@ -1,7 +1,7 @@
 package com.bot.theechoesbot.handler;
 
 import com.bot.theechoesbot.core.Cache;
-import com.bot.theechoesbot.entity.ServerData;
+import com.bot.theechoesbot.core.Core;
 import com.bot.theechoesbot.handler.template.Handler;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.ScheduledEvent;
@@ -19,7 +19,7 @@ public class EventCancelHandler implements Handler<ScheduledEvent>{
 	private final static Logger logger = LoggerFactory.getLogger(EventCancelHandler.class);
 
 	@Override
-	public void handle(ScheduledEvent event, ServerData serverData){
+	public void handle(ScheduledEvent event){
 
 		try{
 
@@ -27,7 +27,7 @@ public class EventCancelHandler implements Handler<ScheduledEvent>{
 			String eventId = event.getId();
 
 			//find the message in schedule
-			TextChannel scheduleChannel = serverData.getTextScheduleChannel();
+			TextChannel scheduleChannel = Core.getServerData().getTextScheduleChannel();
 			List<Message> messageList = scheduleChannel.getHistory().retrievePast(10).complete();
 			Message message = messageList.stream()
 				.filter(m -> m.getContentRaw().contains(eventId))
@@ -66,7 +66,7 @@ public class EventCancelHandler implements Handler<ScheduledEvent>{
 				}
 
 				//send it
-				serverData.getNewsAnnouncesChannel().sendMessage(announceMessage).queue();
+				Core.getServerData().getNewsAnnouncesChannel().sendMessage(announceMessage).queue();
 
 				logger.info("Canceled event was announced. " + eventId);
 

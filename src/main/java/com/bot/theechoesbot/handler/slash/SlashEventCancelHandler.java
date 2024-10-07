@@ -1,7 +1,6 @@
 package com.bot.theechoesbot.handler.slash;
 
 import com.bot.theechoesbot.core.Cache;
-import com.bot.theechoesbot.entity.ServerData;
 import com.bot.theechoesbot.handler.slash.template.SlashHandler;
 import net.dv8tion.jda.api.entities.ScheduledEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -18,7 +17,7 @@ public class SlashEventCancelHandler implements SlashHandler{
 	private final static Logger logger = LoggerFactory.getLogger(SlashEventCancelHandler.class);
 
 	@Override
-	public void handle(SlashCommandInteractionEvent event, ServerData serverData){
+	public void handle(SlashCommandInteractionEvent event){
 
 		try{
 

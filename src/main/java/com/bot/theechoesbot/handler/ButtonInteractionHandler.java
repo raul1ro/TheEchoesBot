@@ -1,6 +1,6 @@
 package com.bot.theechoesbot.handler;
 
-import com.bot.theechoesbot.entity.ServerData;
+import com.bot.theechoesbot.core.Core;
 import com.bot.theechoesbot.handler.template.Handler;
 import com.bot.theechoesbot.service.RegisterService;
 import net.dv8tion.jda.api.entities.Member;
@@ -26,7 +26,7 @@ public class ButtonInteractionHandler implements Handler<ButtonInteractionEvent>
 	}
 
 	@Override
-	public void handle(ButtonInteractionEvent event, ServerData serverData){
+	public void handle(ButtonInteractionEvent event){
 
 		Member member = event.getMember();
 		String buttonId = event.getButton().getId();
@@ -41,7 +41,7 @@ public class ButtonInteractionHandler implements Handler<ButtonInteractionEvent>
 
 		switch(buttonId){
 
-			case "register_intern": registerService.registerIntern(event, member, serverData.getGuild(), serverData.getInternRole()); break;
+			case "register_intern": registerService.registerIntern(event, member, Core.getServerData().getGuild(), Core.getServerData().getInternRole()); break;
 			case "register_member": registerService.createModalRegisterMember(event); break;
 			default: {
 				event.reply("Unknown button id: " + buttonId).setEphemeral(true).queue();

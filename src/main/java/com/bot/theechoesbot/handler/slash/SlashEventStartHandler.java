@@ -1,8 +1,8 @@
 package com.bot.theechoesbot.handler.slash;
 
 import com.bot.theechoesbot.core.Cache;
+import com.bot.theechoesbot.core.Core;
 import com.bot.theechoesbot.handler.slash.template.SlashHandler;
-import com.bot.theechoesbot.entity.ServerData;
 import net.dv8tion.jda.api.entities.ScheduledEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -18,7 +18,7 @@ public class SlashEventStartHandler implements SlashHandler{
 	private final static Logger logger = LoggerFactory.getLogger(SlashEventStartHandler.class);
 
 	@Override
-	public void handle(SlashCommandInteractionEvent event, ServerData serverData){
+	public void handle(SlashCommandInteractionEvent event){
 
 		try{
 
@@ -29,7 +29,7 @@ public class SlashEventStartHandler implements SlashHandler{
 			String eventId = event.getOption("event_id").getAsString();
 
 			//get the schedule and validate it
-			ScheduledEvent scheduledEvent = serverData.getGuild().retrieveScheduledEventById(eventId).complete();
+			ScheduledEvent scheduledEvent = Core.getServerData().getGuild().retrieveScheduledEventById(eventId).complete();
 			if(scheduledEvent == null){
 				event.getHook().sendMessage("Could not find event with id " + eventId).queue();
 				logger.warn("Event not found: " + eventId);

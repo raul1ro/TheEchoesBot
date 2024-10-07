@@ -1,8 +1,8 @@
 package com.bot.theechoesbot.handler;
 
+import com.bot.theechoesbot.core.Core;
 import com.bot.theechoesbot.core.Globals;
 import com.bot.theechoesbot.handler.template.Handler;
-import com.bot.theechoesbot.entity.ServerData;
 import net.dv8tion.jda.api.entities.ScheduledEvent;
 import net.dv8tion.jda.api.events.guild.scheduledevent.ScheduledEventCreateEvent;
 import net.dv8tion.jda.api.utils.MarkdownUtil;
@@ -22,7 +22,7 @@ public class EventCreateHandler implements Handler<ScheduledEventCreateEvent>{
 	private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("EEEE (dd MMM)");
 
 	@Override
-	public void handle(ScheduledEventCreateEvent event, ServerData serverData){
+	public void handle(ScheduledEventCreateEvent event){
 
 		try{
 
@@ -34,9 +34,9 @@ public class EventCreateHandler implements Handler<ScheduledEventCreateEvent>{
 			String message = "- "
 				+ startDay
 				+ " - "
-				+ MarkdownUtil.maskedLink(scheduledEvent.getName(), "https://discord.com/events/" + serverData.getGuildId() + "/" + scheduledEvent.getId());
+				+ MarkdownUtil.maskedLink(scheduledEvent.getName(), "https://discord.com/events/" + Core.getServerData().getGuildId() + "/" + scheduledEvent.getId());
 
-			serverData.getTextScheduleChannel().sendMessage(message).queue();
+			Core.getServerData().getTextScheduleChannel().sendMessage(message).queue();
 
 			logger.info("Created event was announced. " + scheduledEvent.getId());
 
