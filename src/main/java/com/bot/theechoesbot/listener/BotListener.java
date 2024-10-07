@@ -95,7 +95,7 @@ public class BotListener extends ListenerAdapter{
 	@Override
 	public void onShutdown(@NotNull ShutdownEvent event){
 		logger.warn("Bot is shutting down. Reference: " + this);
-		DiscordUtil.sendMessage("Bot has stopped.", Core.getServerData().getBotChannelId(), Core.getBotToken());
+		DiscordUtil.sendLog("Bot has stopped.");
 	}
 
 	@Override

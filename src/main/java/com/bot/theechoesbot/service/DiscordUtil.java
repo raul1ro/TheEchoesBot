@@ -1,5 +1,6 @@
 package com.bot.theechoesbot.service;
 
+import com.bot.theechoesbot.core.Core;
 import com.bot.theechoesbot.core.Globals;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Message;
@@ -169,6 +170,10 @@ public class DiscordUtil{
 
 		}
 
+	}
+
+	public static void sendLog(String text){
+		sendMessage(text, Core.getServerData().getBotChannelId(), Core.getBotToken());
 	}
 
 	/**

@@ -42,7 +42,8 @@ public class RegisterService{
 			event.getHook().sendMessage("Register successfully.\nRole: " + internRole.getName() + "\nIf the registration is wrong contact <@328569043974094849>.").queue();
 			logger.info("User registered as Intern: " + member.getEffectiveName());
 
-
+			//log
+			DiscordUtil.sendLog("User " + member.getEffectiveName() + " has been registered as Intern.");
 
 		}catch(Exception e){
 			event.getHook().sendMessage("Error registering as Intern. Contact <@328569043974094849>.").queue();
@@ -123,6 +124,9 @@ public class RegisterService{
 			//reply
 			event.getHook().sendMessage("Register successfully.\nNickname: " + characterName + "\nRole: " + memberRole.getName() + "\nIf the registration is wrong contact <@328569043974094849>.").setEphemeral(true).queue();
 			logger.info("User registered as Member: " + member.getEffectiveName() + " (" + characterName + ")");
+
+			//log
+			DiscordUtil.sendLog("User " + member.getEffectiveName() + "(" + characterName + ") has been registered as Member.");
 
 		}catch(Exception e){
 
