@@ -50,7 +50,8 @@ public class EventActiveHandler implements Handler<ScheduledEvent>{
 						event.getName(),
 						"https://discord.com/events/" + Core.getServerData().getGuildId() + "/" + eventId
 					) +
-					" is starting. Get Ready.";
+					" is starting. Get Ready." +
+					"\nPlease let us know if you'll be late.";
 
 				//find message in cache and attach it
 				String startMessage = Cache.Event.getAndRemove("start_" + eventId);
