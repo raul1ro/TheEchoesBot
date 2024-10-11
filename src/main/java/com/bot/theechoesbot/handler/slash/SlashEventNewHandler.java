@@ -43,9 +43,9 @@ public class SlashEventNewHandler implements SlashHandler{
 		//leader
 		OptionMapping leaderOption = event.getOption("leader");
 		if(leaderOption != null){
-			description = "**Leader: " + leaderOption.getAsMember().getNickname() + "**";
+			description = "**Leader: " + leaderOption.getAsMember().getAsMention();
 		}else{
-			description = "**Leader: " + event.getMember().getNickname() + "**";
+			description = "**Leader: " + event.getMember().getAsMention() + ">**";
 		}
 
 		//description
