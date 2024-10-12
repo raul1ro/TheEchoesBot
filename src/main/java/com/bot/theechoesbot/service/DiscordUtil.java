@@ -131,9 +131,10 @@ public class DiscordUtil{
 		try{
 
 			//clear the channel - but with thread lock
+			//only bot messages
 			//to be sure the clear will not execute too late and delete register message
 			List<Message> messages = registerChannel.getHistory().retrievePast(5).complete();
-			messages.forEach(e -> e.delete().complete());
+			messages.stream().filter(e -> e.getAuthor().isBot()).forEach(e -> e.delete().complete());
 			logger.info("Successfully cleared the " + registerChannel.getName() + " channel");
 
 			//create the buttons
