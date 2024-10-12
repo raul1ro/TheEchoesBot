@@ -25,7 +25,7 @@ public class RegisterService{
 	/**
 	 * Registering the user as Intern. Request come from a button
 	 */
-	public void registerIntern(ButtonInteractionEvent event, Member member, Guild guild, Role internRole){
+	public void registerAsIntern(ButtonInteractionEvent event, Member member, Guild guild, Role internRole){
 
 		try{
 
@@ -55,7 +55,7 @@ public class RegisterService{
 	/**
 	 * Create a modal which required inputs before registering as member. Request come from a button.
 	 */
-	public void createModalRegisterMember(ButtonInteractionEvent event){
+	public void createModalRegisterAsMember(ButtonInteractionEvent event){
 
 		try{
 
@@ -85,7 +85,7 @@ public class RegisterService{
 	/**
 	 * Register the user as Member. The request comes from a modal.
 	 */
-	public void registerMember(ModalInteractionEvent event, Member member, Guild guild, Role memberRole){
+	public void registerAsMember(ModalInteractionEvent event, Member member, Guild guild, Role memberRole){
 
 		try{
 

@@ -28,7 +28,7 @@ public class ModalInteractionHandler implements Handler<ModalInteractionEvent>{
 
 		switch(modalId){
 
-			case "modal_register_member": this.registerService.registerMember(event, member, Core.getServerData().getGuild(), Core.getServerData().getMemberRole()); break;
+			case "modal_register_member": this.registerService.registerAsMember(event, member, Core.getServerData().getGuild(), Core.getServerData().getMemberRole()); break;
 			default: {
 				event.reply("Unknown modal id: " + modalId).setEphemeral(true).queue();
 				logger.warn("Unknown modal id: " + modalId);

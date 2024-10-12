@@ -41,8 +41,8 @@ public class ButtonInteractionHandler implements Handler<ButtonInteractionEvent>
 
 		switch(buttonId){
 
-			case "register_intern": registerService.registerIntern(event, member, Core.getServerData().getGuild(), Core.getServerData().getInternRole()); break;
-			case "register_member": registerService.createModalRegisterMember(event); break;
+			case "register_intern": registerService.registerAsIntern(event, member, Core.getServerData().getGuild(), Core.getServerData().getInternRole()); break;
+			case "register_member": registerService.createModalRegisterAsMember(event); break;
 			default: {
 				event.reply("Unknown button id: " + buttonId).setEphemeral(true).queue();
 				logger.warn("Unknown button id: " + buttonId);
