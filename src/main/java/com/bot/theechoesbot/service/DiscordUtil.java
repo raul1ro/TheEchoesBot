@@ -126,7 +126,6 @@ public class DiscordUtil{
 	/**
 	 * Create a message with buttons for register
 	 */
-	//tip: it would be nice to clear the channel before init
 	public static void initRegister(TextChannel registerChannel){
 
 		try{
@@ -149,10 +148,11 @@ public class DiscordUtil{
 					"""
 					To have access to the server you need to register yourself.
 					You can register yourself as **Intern** or **Member**.
-					- Intern - you are not in guild. Limited access.
-					- Member - you are in the guild. Full access.
-	
-					**For any problem please contact <@328569043974094849>.**
+					- Intern - __you are not in guild. Limited access.__
+					- Member - __you are in the guild. Full access.__
+					_If you register as Intern, and later you become member of the guild, ask <@328569043974094849> or <@658643411120685066> for upgrade._
+					
+					For any problem please contact <@328569043974094849>.
 					"""
 				).setActionRow(internButton, memberButton)
 				.build();
