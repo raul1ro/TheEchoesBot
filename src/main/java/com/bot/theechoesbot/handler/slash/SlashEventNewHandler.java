@@ -15,6 +15,8 @@ import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Implement /event-new
@@ -37,22 +39,32 @@ public class SlashEventNewHandler implements SlashHandler{
 		String date = event.getOption("date").getAsString();
 		String time = event.getOption("time").getAsString();
 
-		//description var
-		String description;
+		//nessages for description
+		List<String> messages = new ArrayList<>();
 
 		//leader
 		OptionMapping leaderOption = event.getOption("leader");
 		if(leaderOption != null){
-			description = "**Leader: " + leaderOption.getAsMember().getAsMention();
+			messages.add("Leader: " + leaderOption.getAsMember().getNickname());
 		}else{
-			description = "**Leader: " + event.getMember().getAsMention() + "**";
+			messages.add("Leader: " + event.getMember().getNickname());
+		}
+
+		//required ilvl
+		OptionMapping required_ilvl = event.getOption("required_ilvl");
+		if(required_ilvl != null){
+			messages.add("Required ilvl: " + required_ilvl.getAsLong());
+		}else{
+			messages.add("Required ilvl: None");
 		}
 
 		//description
 		OptionMapping descriptionOption = event.getOption("description");
 		if(descriptionOption != null){
-			description = description + "\n" + descriptionOption.getAsString();
+			messages.add(descriptionOption.getAsString());
 		}
+
+		String description = String.join("\n", messages);
 
 		//prepare date-time
 		OffsetDateTime dateTime;

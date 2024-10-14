@@ -69,6 +69,12 @@ public class DiscordUtil{
 							true
 						),
 						new OptionData(
+							OptionType.INTEGER,
+							"required_ilvl",
+							"(optional) The required item level.",
+							false
+						),
+						new OptionData(
 							OptionType.STRING,
 							"description",
 							"(optional) The description of the event.",
