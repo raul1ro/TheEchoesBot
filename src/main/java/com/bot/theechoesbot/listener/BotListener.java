@@ -9,7 +9,6 @@ import com.bot.theechoesbot.handler.slash.SlashEventStartHandler;
 import com.bot.theechoesbot.handler.slash.SlashRollHandler;
 import com.bot.theechoesbot.handler.slash.template.SlashHandler;
 import com.bot.theechoesbot.service.DiscordUtil;
-import com.bot.theechoesbot.entity.ServerData;
 import net.dv8tion.jda.api.entities.ScheduledEvent;
 import net.dv8tion.jda.api.events.guild.scheduledevent.ScheduledEventCreateEvent;
 import net.dv8tion.jda.api.events.guild.scheduledevent.update.ScheduledEventUpdateStatusEvent;
@@ -22,8 +21,6 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 
