@@ -1,11 +1,13 @@
-package com.bot.theechoesbot.handler.slash;
+package com.bot.theechoesbot.command;
 
+import com.bot.theechoesbot.command.template.SlashCommand;
 import com.bot.theechoesbot.core.Core;
 import com.bot.theechoesbot.core.Globals;
-import com.bot.theechoesbot.handler.slash.template.SlashHandler;
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.SlashCommandInteraction;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.restaction.ScheduledEventAction;
 import net.dv8tion.jda.api.utils.MarkdownUtil;
 import org.slf4j.Logger;
@@ -14,44 +16,84 @@ import org.slf4j.LoggerFactory;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Implement /event-new
- */
-@SuppressWarnings("DataFlowIssue")
-public class SlashEventNewHandler implements SlashHandler{
+public class EventNewSlashCommand extends SlashCommand{
 
-	private final static Logger logger = LoggerFactory.getLogger(SlashEventNewHandler.class);
+	public final static Logger logger = LoggerFactory.getLogger(EventNewSlashCommand.class);
 
-	private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd - HH:mm");
+	public EventNewSlashCommand(){
+		super(
+			"event-new",
+			List.of(Core.getServerData().getRoleMasterId()),
+			"Create a new event.",
+			List.of(
+				new OptionData(
+					OptionType.STRING,
+					"title",
+					"The title of the event.",
+					true
+				),
+				new OptionData(
+					OptionType.STRING,
+					"date",
+					"Date of the event. Format: yyyy-mm-dd",
+					true
+
+				),
+				new OptionData(
+					OptionType.STRING,
+					"time",
+					"Time of the event. Format: hh:mm (server-time)",
+					true
+				),
+				new OptionData(
+					OptionType.INTEGER,
+					"required_ilvl",
+					"The required item level.",
+					false
+				),
+				new OptionData(
+					OptionType.STRING,
+					"description",
+					"The description of the event.",
+					false
+				),
+				new OptionData(
+					OptionType.USER,
+					"leader",
+					"The leader of the event.",
+					false
+				)
+			)
+		);
+	}
 
 	@Override
-	public void handle(SlashCommandInteractionEvent event){
+	protected void executeImpl(SlashCommandInteraction interaction){
 
 		//process may take more than 3 seconds, so set bot in thinking mode (15mins to reply)
-		event.deferReply().queue();
+		interaction.deferReply().queue();
 
 		//extract the inputs
-		String title = event.getOption("title").getAsString();
-		String date = event.getOption("date").getAsString();
-		String time = event.getOption("time").getAsString();
+		String title = interaction.getOption("title").getAsString();
+		String date = interaction.getOption("date").getAsString();
+		String time = interaction.getOption("time").getAsString();
 
 		//nessages for description
 		List<String> messages = new ArrayList<>();
 
 		//leader
-		OptionMapping leaderOption = event.getOption("leader");
+		OptionMapping leaderOption = interaction.getOption("leader");
 		if(leaderOption != null){
 			messages.add("Leader: " + leaderOption.getAsMember().getNickname());
 		}else{
-			messages.add("Leader: " + event.getMember().getNickname());
+			messages.add("Leader: " + interaction.getMember().getNickname());
 		}
 
 		//required ilvl
-		OptionMapping required_ilvl = event.getOption("required_ilvl");
+		OptionMapping required_ilvl = interaction.getOption("required_ilvl");
 		if(required_ilvl != null){
 			messages.add("Required ilvl: " + required_ilvl.getAsLong());
 		}else{
@@ -59,7 +101,7 @@ public class SlashEventNewHandler implements SlashHandler{
 		}
 
 		//description
-		OptionMapping descriptionOption = event.getOption("description");
+		OptionMapping descriptionOption = interaction.getOption("description");
 		if(descriptionOption != null){
 			messages.add(descriptionOption.getAsString());
 		}
@@ -71,13 +113,13 @@ public class SlashEventNewHandler implements SlashHandler{
 		try{
 
 			//parse date-time -> set zone -> change time to utc -> to offsetdatetime
-			dateTime = LocalDateTime.parse(date + " - " + time, this.dateTimeFormatter)
+			dateTime = LocalDateTime.parse(date + " - " + time, Globals.DATE_TIME_FORMATTER)
 				.atZone(Globals.ZONE_ID_SERVER)
 				.withZoneSameInstant(ZoneId.of("UTC"))
 				.toOffsetDateTime();
 
 		}catch(Exception e){
-			event.getHook().sendMessage("Date (yyyy-mm-dd) or time (hh:mm server-time) in wrong format: " + date + " - " + time).queue();
+			interaction.getHook().sendMessage("Date (yyyy-mm-dd) or time (hh:mm server-time) in wrong format: " + date + " - " + time).queue();
 			logger.error("Invalid format: " + date + " - " + time, e);
 			return;
 		}
@@ -87,7 +129,7 @@ public class SlashEventNewHandler implements SlashHandler{
 			//create the event
 			ScheduledEventAction scheduledEvent = Core.getServerData().getGuild().createScheduledEvent(
 				title,
-				Core.getServerData().getVoiceEventChannel(),
+				Core.getServerData().getChannelVoiceEvent(),
 				dateTime
 			);
 			scheduledEvent = scheduledEvent.setDescription(description);
@@ -104,7 +146,7 @@ public class SlashEventNewHandler implements SlashHandler{
 					logger.info("Event created: " + eventId);
 
 					//get the hook
-					InteractionHook hook = event.getHook();
+					InteractionHook hook = interaction.getHook();
 
 					//send the messages
 					hook.sendMessage("Event created: " + eventId).and(
@@ -118,13 +160,13 @@ public class SlashEventNewHandler implements SlashHandler{
 
 				},
 				(error) -> {
-					event.getHook().sendMessage("Error: " + error.getMessage()).queue();
+					interaction.getHook().sendMessage("Error: " + error.getMessage()).queue();
 					logger.error("Error creating scheduled event", error);
 				}
 			);
 
 		}catch(Exception e){
-			event.getHook().sendMessage("Error: " + e.getMessage()).queue();
+			interaction.getHook().sendMessage("Error creating a new event: " + e.getMessage()).queue();
 			logger.error("Error creating scheduled event", e);
 		}
 

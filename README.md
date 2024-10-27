@@ -8,18 +8,25 @@
 <p>Features:</p>
 <ul>
     <li>Slash commands:<ul>
-        <li><code>/roll [*upper_limit]</code> - roll a number in a range.</li>
-        <li><code>/event-new [title, date, time, *description, *leader]</code> - create a new event.</li>
-        <li><code>/event-start [event_id, *message]</code> - start the event.</li>
-        <li><code>/event-cancel [event_id, *reason]</code> - cancel the event.</li>
+        <li><code>roll [*upper_limit]</code> - roll a number in a range.</li>
+        <li><code>event-new [title, date, time, *description, *leader]</code> - create a new event.</li>
+        <li><code>event-start [event_id, *message]</code> - start the event.</li>
+        <li><code>event-cancel [event_id, *reason]</code> - cancel the event.</li>
+        <li><code>clear-channel [channel, only_app]</code> - delete all (or only app) messages from a channel.</li>
+    </ul></li>
+    <li>Message commands:<ul>
+        <li><code>Edit Message</code> - edit the message of the bot.</li>
+    </ul></li>
+    <li>Listen events:<ul>
+        <li><code>ScheduledEventCreateEvent</code> - create a message with the new event.</li>
+        <li><code>ScheduledEventUpdateStatusEvent</code> - update the message when the event status changes.</li>
     </ul></li>
     <li>Register new members:<ul>
-        <li>Create a message with buttons in register channel.</li>
+        <li>Create registration message (with buttons).</li>
         <li>Buttons:<ul>
             <li>Intern - assign the role <code>Intern</code>.</li>
             <li>Member - open a modal which requires character name. Validate it and assign the role <code>Member</code>.</li>
         </ul></li>
     </ul></li>
-    <li>Listen for <code>ScheduledEvent</code> (create, updateStatus) and perform the task according to the action.</li>
     <li>Crawl data of the character for registration.</li>
 </ul>

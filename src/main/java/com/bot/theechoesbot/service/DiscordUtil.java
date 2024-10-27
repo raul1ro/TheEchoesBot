@@ -5,9 +5,7 @@ import com.bot.theechoesbot.core.Globals;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
-import net.dv8tion.jda.api.interactions.commands.OptionType;
-import net.dv8tion.jda.api.interactions.commands.build.Commands;
-import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
@@ -30,99 +28,11 @@ public class DiscordUtil{
 	/**
 	 * Update the commands
 	 */
-	public static void initCommands(JDA jda){
+	public static void updateCommands(JDA jda, List<CommandData> commands){
 
 		jda.updateCommands()
-			.addCommands(
-
-				//roll
-				Commands.slash("roll", "Roll a random number.")
-					.addOptions(
-						new OptionData(
-							OptionType.INTEGER,
-							"upper_limit",
-							"The highest number which can be rolled.",
-							false
-						).setMinValue(1).setMaxValue(1000)
-					),
-
-				//event-new
-				Commands.slash("event-new", "Create a new event.")
-					.addOptions(
-						new OptionData(
-							OptionType.STRING,
-							"title",
-							"The title of the event.",
-							true
-						),
-						new OptionData(
-							OptionType.STRING,
-							"date",
-							"Date of the event. Format: yyyy-mm-dd",
-							true
-
-						),
-						new OptionData(
-							OptionType.STRING,
-							"time",
-							"Time of the event. Format: hh:mm (server-time)",
-							true
-						),
-						new OptionData(
-							OptionType.INTEGER,
-							"required_ilvl",
-							"(optional) The required item level.",
-							false
-						),
-						new OptionData(
-							OptionType.STRING,
-							"description",
-							"(optional) The description of the event.",
-							false
-						),
-						new OptionData(
-							OptionType.USER,
-							"leader",
-							"(optional) The leader of the event.",
-							false
-						)
-					),
-
-				//event-start
-				Commands.slash("event-start", "Start the event.")
-					.addOptions(
-						new OptionData(
-							OptionType.STRING,
-							"event_id",
-							"The id of the event.",
-							true
-						),
-						new OptionData(
-							OptionType.STRING,
-							"message",
-							"(optional) Additional message in announcement.",
-							false
-						)
-					),
-
-				//event-cancel
-				Commands.slash("event-cancel", "Cancel the event.")
-					.addOptions(
-						new OptionData(
-							OptionType.STRING,
-							"event_id",
-							"The id of the event.",
-							true
-						),
-						new OptionData(
-							OptionType.STRING,
-							"reason",
-							"(optional) The Reason of cancellation.",
-							false
-						)
-					)
-
-			).queue(
+			.addCommands(commands)
+			.queue(
 				s -> logger.info("Updated the commands."),
 				e -> logger.error("Error updating the commands.", e)
 			);
@@ -132,7 +42,7 @@ public class DiscordUtil{
 	/**
 	 * Create a message with buttons for register
 	 */
-	public static void initRegister(TextChannel registerChannel){
+	public static void updateRegister(TextChannel registerChannel){
 
 		try{
 
@@ -186,7 +96,7 @@ public class DiscordUtil{
 	/**
 	 * Send a message directly, without any library.
 	 */
-	public static boolean sendMessage(String text, long channelId, String botToken){
+	public static void sendMessage(String text, long channelId, String botToken){
 
 		try{
 
@@ -207,16 +117,14 @@ public class DiscordUtil{
 				int responseCode = response.code();
 
 				//check response
-				if(responseCode == 200){ return true; }
-
-				//noinspection ConstantConditions
-				throw new Exception("code: " + responseCode + " - status: " + response.message() + " - body: " + response.body().string());
+				if(responseCode != 200){
+					throw new Exception("code: " + responseCode + " - status: " + response.message() + " - body: " + response.body().string());
+				}
 
 			}
 
 		}catch(Exception e){
 			logger.error("Failed to send message.", e);
-			return false;
 		}
 
 	}

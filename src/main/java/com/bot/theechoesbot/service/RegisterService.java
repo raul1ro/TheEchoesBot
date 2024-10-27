@@ -15,7 +15,6 @@ import org.slf4j.LoggerFactory;
 /**
  * Register service
  */
-@SuppressWarnings("DataFlowIssue")
 public class RegisterService{
 
 	private final static Logger logger = LoggerFactory.getLogger(RegisterService.class);
@@ -28,6 +27,13 @@ public class RegisterService{
 	public void registerAsIntern(ButtonInteractionEvent event, Member member, Guild guild, Role internRole){
 
 		try{
+
+			//if the user has roles, then return
+			if(!member.getRoles().isEmpty()){
+				event.reply("You are already registered.\nIf you think this is an error contact <@328569043974094849>.").setEphemeral(true).queue();
+				logger.info("User already registered: " + member.getEffectiveName());
+				return;
+			}
 
 			//defer
 			event.deferReply(true).queue();
@@ -59,6 +65,13 @@ public class RegisterService{
 
 		try{
 
+			//if the user has roles, then return
+			if(!event.getMember().getRoles().isEmpty()){
+				event.reply("You are already registered.\nIf you think this is an error contact <@328569043974094849>.").setEphemeral(true).queue();
+				logger.info("User already registered: " + event.getMember().getEffectiveName());
+				return;
+			}
+
 			//ask for character name
 			TextInput characterNameInput = TextInput.create("input_character_name", "Character name", TextInputStyle.SHORT)
 				.setMinLength(2)
@@ -88,6 +101,13 @@ public class RegisterService{
 	public void registerAsMember(ModalInteractionEvent event, Member member, Guild guild, Role memberRole){
 
 		try{
+
+			//if the user has roles, then return
+			if(!member.getRoles().isEmpty()){
+				event.reply("You are already registered.\nIf you think this is an error contact <@328569043974094849>.").setEphemeral(true).queue();
+				logger.info("User already registered: " + member.getEffectiveName());
+				return;
+			}
 
 			event.deferReply(true).queue();
 
@@ -126,7 +146,7 @@ public class RegisterService{
 			logger.info("User registered as Member: " + member.getEffectiveName() + " (" + characterName + ")");
 
 			//log
-			DiscordUtil.sendLog("User " + member.getEffectiveName() + "(" + characterName + ") has been registered as Member.");
+			DiscordUtil.sendLog("User " + member.getEffectiveName() + " (" + characterName + ") has been registered as Member.");
 
 		}catch(Exception e){
 

@@ -1,8 +1,8 @@
-package com.bot.theechoesbot.handler;
+package com.bot.theechoesbot.eventhandler;
 
 import com.bot.theechoesbot.core.Core;
 import com.bot.theechoesbot.core.Globals;
-import com.bot.theechoesbot.handler.template.Handler;
+import com.bot.theechoesbot.eventhandler.template.EventHandler;
 import net.dv8tion.jda.api.entities.ScheduledEvent;
 import net.dv8tion.jda.api.events.guild.scheduledevent.ScheduledEventCreateEvent;
 import net.dv8tion.jda.api.utils.MarkdownUtil;
@@ -15,9 +15,9 @@ import java.time.format.DateTimeFormatter;
 /**
  * Implement Handler for ScheduledEventCreateEvent
  */
-public class EventCreateHandler implements Handler<ScheduledEventCreateEvent>{
+public class EventCreateEventHandler implements EventHandler<ScheduledEventCreateEvent>{
 
-	private final static Logger logger = LoggerFactory.getLogger(EventCreateHandler.class);
+	private final static Logger logger = LoggerFactory.getLogger(EventCreateEventHandler.class);
 
 	private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("EEEE (dd MMM)");
 
@@ -36,7 +36,7 @@ public class EventCreateHandler implements Handler<ScheduledEventCreateEvent>{
 				+ " - "
 				+ MarkdownUtil.maskedLink(scheduledEvent.getName(), "https://discord.com/events/" + Core.getServerData().getGuildId() + "/" + scheduledEvent.getId());
 
-			Core.getServerData().getTextScheduleChannel().sendMessage(message).queue();
+			Core.getServerData().getChannelTextSchedule().sendMessage(message).queue();
 
 			logger.info("Created event was announced. " + scheduledEvent.getId());
 
